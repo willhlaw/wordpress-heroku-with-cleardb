@@ -687,6 +687,8 @@ if ( !class_exists( 'Simple_Map' ) ) {
 			var markersArray = [];
 			var infowindowsArray = [];
 
+			alert('hi there');
+
 			function clearInfoWindows() {
 				if (infowindowsArray) {
 					for (var i=0;i<infowindowsArray.length;i++) {
