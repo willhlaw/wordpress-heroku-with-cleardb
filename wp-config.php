@@ -14,8 +14,8 @@
  * @package WordPress
  */
 
-// ** Heroku Postgres settings - from Heroku Environment ** //
-$db = parse_url($_ENV["DATABASE_URL"]);
+// ** Heroku ClearDB settings - from Heroku Environment ** //
+$db = parse_url($_ENV["CLEARDB_DATABASE_URL"]);
 
 // ** MySQL settings - You can get this info from your web host ** //
 /** The name of the database for WordPress */
@@ -45,14 +45,14 @@ define('DB_COLLATE', '');
  *
  * @since 2.6.0
  */
-define('AUTH_KEY',         '/:m48iFIT|,XlI1^:TOqK3yt`LNR@PTz{%J(-[:J<Ur[;D RMWV(l]wlqhQOvfx}');
-define('SECURE_AUTH_KEY',  'ONA:#>Ocstf!@N1,HXW~0-P$t7[@0~a9z)pgRXv,Yxx[<~1okRvGq(xI#liAq*AJ');
-define('LOGGED_IN_KEY',    '}DGtY_+i&*^(V%0GuqD+xvpTP>$i)Ny@Vc|0k:tAAN:P-mOP@y7m[(io_<={#hP|');
-define('NONCE_KEY',        'rAQ+i&rj3(O{uKX,hW;O9p1Tet4rx^iFdVE]}]<GI!%k0n:Zk+_rMTw%/H)Z1XuP');
-define('AUTH_SALT',        'X9e4[D`|V6/h+L|<}`?o>&C(b8#pfChspBsc1e.h@sn|qAHkK$_-@1*ma#DzzRj`');
-define('SECURE_AUTH_SALT', 'S5q-z]buWIOe9; sYAfM}*:e*}]m|j.Q8Myx,`nU~-S`0bj>wI=epr7ikauY7iJj');
-define('LOGGED_IN_SALT',   'IHZ>|M[]L,1|7#N6,}Rk@L|NH.k>gF%Hg?yIP7yK(-j@zo3|Z))<w;[iR^wEu|k9');
-define('NONCE_SALT',       '+Di~g(QS kX#.)Xk)ItB[TUUwS&^|vHu|BLeHp}jq+~K6E{@!je-aaplJTv1b=f6');
+define('AUTH_KEY',         'b]Jj+uqf${~+N2ysy%z%d{X5i~:|V95l$@KD_)3vP954X--[4Wjv!Y-n{JP|QY~G');
+define('SECURE_AUTH_KEY',  'G3Vg~3-/iJW;wk|OK8q((z}v@5e_1;u3|/LT5UXdo-sDF<BRU HP|n?F]e)J-xAT');
+define('LOGGED_IN_KEY',    '1:SDfGoZ:$`?];[F]fZtM<U7?~7><AxL>$BDr?LY939e_S$Fo/j/AbD0d`=|7;;#');
+define('NONCE_KEY',        'w<Nlf)Wny9EoRV|spJ~zxz*fe9<QERd*CP3{5Lpt-z@$$$yJi_7,w3@4pV%Mm;P$');
+define('AUTH_SALT',        'DGddJ^f6Dy+ST&2-7h~}m1KOo!9{~,P7KoC4SzD&Fa{2(L_Uy eO`wqEp[j|a29z');
+define('SECURE_AUTH_SALT', 'd@DsC?+m%kU9`yA5]ie2!2jxTtM6}a0@D63RD+1a;?y#My-6 #+hm<-lqf%1H#+a');
+define('LOGGED_IN_SALT',   'd_Fy=CVccQ2q-u%6C<<{G=eZ(q;$XT-,d.-&*z87}*hc>4Nf-q]BLI1z{c~CU28^');
+define('NONCE_SALT',       'P]wT&7MO+x#E|/4^`,WutH.7GUE,jS!-0n/fQjo#bxu0.h-gBl/0~8iXwE#;n`Hc');
 
 /**#@-*/
 
@@ -72,7 +72,7 @@ $table_prefix  = 'wp_';
  * de_DE.mo to wp-content/languages and set WPLANG to 'de_DE' to enable German
  * language support.
  */
-define('WPLANG', '');
+define('WPLANG', $_ENV["WORDPRESS_LANG"]);
 
 /**
  * For developers: WordPress debugging mode.
