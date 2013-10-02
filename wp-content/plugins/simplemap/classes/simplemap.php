@@ -687,7 +687,11 @@ if ( !class_exists( 'Simple_Map' ) ) {
 			var markersArray = [];
 			var infowindowsArray = [];
 
-			alert('hi there');
+			var directionsDisplay;
+			var directionsService = new google.maps.DirectionsService();
+			var directionsResults = (document.getElementById('simplemap-directions') === null) ? $('#simplemap').after('<div id="simplemap-directions">  </div>').next().get(0) : document.getElementById('simplemap-directions');
+			var waypoints = [];
+
 
 			function clearInfoWindows() {
 				if (infowindowsArray) {
@@ -737,6 +741,9 @@ if ( !class_exists( 'Simple_Map' ) ) {
 					mapTypeId: google.maps.MapTypeId[map_type] 
 				};
 				map = new google.maps.Map( document.getElementById( "simplemap" ), myOptions );
+				directionsDisplay = new google.maps.DirectionsRenderer({suppressMarkers: true, preserveViewport: false, draggable: true});
+				directionsDisplay.setMap(map);
+				directionsDisplay.setPanel(directionsResults);
 
 				// Adsense for Google Maps
 				<?php 
@@ -1335,15 +1342,28 @@ if ( !class_exists( 'Simple_Map' ) ) {
 
 				html += '	</div>';
 
-				google.maps.event.addListener(marker, 'click', function() {
+				var htmlWrapper = "<div id='wrapper'>" +
+					"<br/><label>Get Directions to here from:</label>" +
+					"<input type=\"text\" id=\"startAddress\" />" +
+					"<input type=\"button\" id=\"goGetDirections\" value=\"go\" />" +
+					html +
+					"</div>";
+
+				google.maps.event.addListener(marker, 'click', function(e) {
 					clearInfoWindows();
 					var infowindow = new google.maps.InfoWindow({
 						maxWidth: maxbubblewidth,
-						content: html
+						content: htmlWrapper
 					});
 					infowindow.open(map, marker);
 					infowindowsArray.push(infowindow);
 					window.location = '#map_top';
+					google.maps.event.addDomListener(infowindow, 'domready', function() {
+						$('#goGetDirections').click(function() {
+							computeDirections(document.getElementById('startAddress').value, e.latLng.lat() , e.latLng.lng());
+							infoWindow.close();
+						});
+					});					
 				});
 
 				return marker;
