@@ -1378,7 +1378,7 @@ if ( !class_exists( 'Simple_Map' ) ) {
 					infowindowsArray.push(infowindow);
 					window.location = '#map_top';
 					google.maps.event.addDomListener(infowindow, 'domready', function() {
-						$('#goGetDirections').click(function() {
+						document.getElementById('goGetDirections').click(function() {
 							computeDirections(document.getElementById('startAddress').value, e.latLng.lat() , e.latLng.lng());
 							infoWindow.close();
 						});
