@@ -752,11 +752,12 @@ if ( !class_exists( 'Simple_Map' ) ) {
 
 				//get or create a div to populate the directions
 				var directionsResults = document.getElementById('simplemap-directions');
-				if (simplemapDirectionsDiv === null) {
+				if (directionsResults === null) {
 					//create div for directions 
 					var el = document.createElement("div");
 					el.id = "simplemap-directions";
-					insertAfter(simplemapDiv, el)
+					insertAfter(document.getElementById( "simplemap" ), el);
+					directionsResults = el;
 				}
 			
 				directionsDisplay.setPanel(directionsResults);
