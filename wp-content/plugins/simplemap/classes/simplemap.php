@@ -709,6 +709,10 @@ if ( !class_exists( 'Simple_Map' ) ) {
 				}
 			}
 
+			function insertAfter(referenceNode, newNode) {
+				referenceNode.parentNode.insertBefore(newNode, referenceNode.nextSibling);
+			}
+
 			//function load_simplemap( lat, lng, aspid, ascid, asma ) {
 			function load_simplemap( lat, lng, aspid, ascid, asma, shortcode_zoom_level, map_type, shortcode_autoload ) {
 
@@ -740,10 +744,21 @@ if ( !class_exists( 'Simple_Map' ) ) {
 					center: latlng,
 					mapTypeId: google.maps.MapTypeId[map_type] 
 				};
+
+
 				map = new google.maps.Map( document.getElementById( "simplemap" ), myOptions );
 				directionsDisplay = new google.maps.DirectionsRenderer({suppressMarkers: true, preserveViewport: false, draggable: true});
 				directionsDisplay.setMap(map);
-				directionsResults = (document.getElementById('simplemap-directions') === null) ? $('#simplemap').after('<div id="simplemap-directions">  </div>').next().get(0) : document.getElementById('simplemap-directions');
+
+				//get or create a div to populate the directions
+				var directionsResults = document.getElementById('simplemap-directions');
+				if (simplemapDirectionsDiv === null) {
+					//create div for directions 
+					var el = document.createElement("div");
+					el.id = "simplemap-directions";
+					insertAfter(simplemapDiv, el)
+				}
+			
 				directionsDisplay.setPanel(directionsResults);
 
 				directionsService = new google.maps.DirectionsService();
