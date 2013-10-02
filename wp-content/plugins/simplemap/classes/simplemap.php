@@ -688,7 +688,7 @@ if ( !class_exists( 'Simple_Map' ) ) {
 			var infowindowsArray = [];
 
 			var directionsDisplay;
-			var directionsService = new google.maps.DirectionsService();
+			var directionsService;
 			var directionsResults = (document.getElementById('simplemap-directions') === null) ? $('#simplemap').after('<div id="simplemap-directions">  </div>').next().get(0) : document.getElementById('simplemap-directions');
 			var waypoints = [];
 
@@ -744,6 +744,8 @@ if ( !class_exists( 'Simple_Map' ) ) {
 				directionsDisplay = new google.maps.DirectionsRenderer({suppressMarkers: true, preserveViewport: false, draggable: true});
 				directionsDisplay.setMap(map);
 				directionsDisplay.setPanel(directionsResults);
+
+				directionsService = new google.maps.DirectionsService();
 
 				// Adsense for Google Maps
 				<?php 
