@@ -1183,13 +1183,13 @@ if ( !class_exists( 'Simple_Map' ) ) {
 			}
 
 				/**
-			 * Get the directions
+			 * Get the directions from google
 			 * @author Will Lawrence <will.lawrence@gmail.com>
 			 * @param string start (start address)
 			 * @param integer endLat
 			 * @param integer endLng
 			 */
-			computeDirections : function(start, endlat, endlng) {
+			function computeDirections(start, endlat, endlng) {
 				var request = {
 					origin: start, 
 					destination: new google.maps.LatLng(endlat, endlng),
