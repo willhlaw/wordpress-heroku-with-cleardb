@@ -1182,6 +1182,28 @@ if ( !class_exists( 'Simple_Map' ) ) {
 				return returnString;
 			}
 
+				/**
+			 * Get the directions
+			 * @author Will Lawrence <will.lawrence@gmail.com>
+			 * @param string start (start address)
+			 * @param integer endLat
+			 * @param integer endLng
+			 */
+			computeDirections : function(start, endlat, endlng) {
+				var request = {
+					origin: start, 
+					destination: new google.maps.LatLng(endlat, endlng),
+					travelMode: google.maps.DirectionsTravelMode.DRIVING
+				};
+				map.directionsService.route(request, function(response, status) {
+					if (status == google.maps.DirectionsStatus.OK) {
+						map.directionsDisplay.setDirections(response);
+					} else {
+						alert('Error generating directions. Please try entering another address.');
+					}
+				});
+			}
+
 			function createMarker( locationData ) {
 
 				// Init tax heights
@@ -1379,9 +1401,8 @@ if ( !class_exists( 'Simple_Map' ) ) {
 					window.location = '#map_top';
 					google.maps.event.addDomListener(infowindow, 'domready', function() {
 						jQuery('#goGetDirections').click(function() {
-							console.log(e);
 							computeDirections(document.getElementById('startAddress').value, e.latLng.lat() , e.latLng.lng());
-							infoWindow.close();
+							infowindow.close();
 						});
 					});					
 				});
