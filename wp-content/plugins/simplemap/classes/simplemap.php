@@ -690,8 +690,32 @@ if ( !class_exists( 'Simple_Map' ) ) {
 			var directionsDisplay;
 			var directionsService;
 			var directionsResults;
-			var waypoints = [];
 
+			var directionWaypoints = function() {
+				waypoints : [],
+				add : function (latlngString, stopOverFlag) {
+					var stopOver = stopOverFlag || true;
+					waypoints.push({
+						location: latlngString,
+						stopover: stopOver
+
+					})
+				},
+				remove : function (latlngString) {
+					var length = waypoints.length;
+					var index = -1;
+					for (int i = 0; i < l; i++) {
+						if (waypoints[i].location === latlngString) {
+							index = i;
+							break;
+						}
+					}
+					if (index != -1) {
+						waypoints.slice(index, 1);
+					}
+					return index;
+				}
+			};
 
 			function clearInfoWindows() {
 				if (infowindowsArray) {
@@ -1193,6 +1217,7 @@ if ( !class_exists( 'Simple_Map' ) ) {
 				var request = {
 					origin: start, 
 					destination: new google.maps.LatLng(endlat, endlng),
+					waypoints: directionsWaypoints.waypoints,
 					travelMode: google.maps.DirectionsTravelMode.DRIVING
 				};
 				directionsService.route(request, function(response, status) {
@@ -1401,6 +1426,7 @@ if ( !class_exists( 'Simple_Map' ) ) {
 					window.location = '#map_top';
 					google.maps.event.addDomListener(infowindow, 'domready', function() {
 						jQuery('#goGetDirections').click(function() {
+							directionsWaypoints.add("" + e.latLng.lat() + "," + e.latLng.lng());
 							computeDirections(document.getElementById('startAddress').value, e.latLng.lat() , e.latLng.lng());
 							infowindow.close();
 						});
