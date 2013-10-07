@@ -1651,7 +1651,7 @@ if ( !class_exists( 'Simple_Map' ) ) {
 					if ( '' != dir_address2 ) { dir_address += '(' + escape( dir_address2 ) + ')' };
 
 					//html += '<a class="result_directions" href="http://google' + default_domain + '/maps?saddr=' + searchData.homeAddress + '&daddr=' + dir_address + '" target="_blank">' + get_directions_text + '</a>';
-					html += '<a class="result_directions" href="" onclick="directions.computeDirections(null, dir_address, \'address\')">' + Add to Trip + '</a>'; //Custom injection for GmapDirections so instead of new page, user can add the site as a stop / waypoint on the map
+					html += '<a class="result_directions" href="" onclick="directions.computeDirections(null, dir_address, \'address\')">' + 'Add to Trip' + '</a>'; //Custom injection for GmapDirections so instead of new page, user can add the site as a stop / waypoint on the map
 				}
 				html += '</div>';
 				html += '<div style="clear: both;"></div>';
