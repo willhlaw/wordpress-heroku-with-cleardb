@@ -752,29 +752,32 @@ if ( !class_exists( 'Simple_Map' ) ) {
 					GmapDirections.prototype.computeDirections = function (start, endLat, endLng) {
 
 						//if startPoint does not exist, then create it
+						var startAddress = null;
 						var startPoint = document.getElementById('gd-startPoint');
 						if (!startPoint) {
 							var startPointDiv = document.createElement("div");
 							startPointDiv.id = thisObj.startPointDivID || "gd-start";
-							startPointDiv.innerHTML =  "<label for=\"gd-startPoint\">Trip's Starting Address (double-click to change):</label>" +
-							"<span contenteditable=\"true\" id=\"gd-startPoint\" style=\"padding: 3px;\" />" +
-							"<input type=\"button\" id=\"gd-reGetDirections\" value=\"Recalculate Trip\" />" +
+							startPointDiv.innerHTML =  "<label for=\"gd-startPoint\">Your trip's starting address:</label>" +
+							"<span contenteditable=\"true\" id=\"gd-startPoint\" style=\"padding: 3px; background-color: lightgray\" />" +
+							"<input type=\"button\" id=\"gd-reGetDirections\" value=\"Recalculate Trip\" />";
 							insertAfter(document.getElementById( mapContainerId ), startPointDiv);
 							//add click event to recalculate with new start point with other stops / waypoints the same.
-							jQuery('#gd-reGetDirections').click(function() {
+							jQuery('.gd-reGetDirections').click(function() {
 								thisObj.computeDirections(); //computeDirections handles all the defaults (grabs gd-startPoint from page and uses last waypoint)
 							});
 							startPoint = document.getElementById('gd-startPoint');
+							startAddress = start;
+						} else {
+							startAddress = startPoint.innerHTML;
 						}
 
-						var start = document.getElementById('gd-startPoint').innerHTML || start; 
-						document.getElementById('gd-startPoint').innerHTML = start; //sets it in case it is the first address from infowindow
-						//need to remove the last waypoint because it is the same as our desintation
+						startPoint.innerHTML = startAddress; //sets it in case it is the first address from infowindow
+						//need to remove the last waypoint because it is the same as our destination, and destination is required
 						var stopPoints = thisObj.waypoints.slice(0); //essentially clones the array doing a shallow copy
 						stopPoints.length = stopPoints.length - 1;
 						var endPoint = (!endLng) ? thisObj.waypoints[thisObj.waypoints.length-1].location : new google.maps.LatLng(endLat, endLng); //use last waypoint if no end points were passed in
 						var request = {
-							origin: start, 
+							origin: startAddress, 
 							destination: endPoint,
 							waypoints: stopPoints,
 							optimizeWaypoints: thisObj.optimizeWaypoints || true,
@@ -817,7 +820,9 @@ if ( !class_exists( 'Simple_Map' ) ) {
 						google.maps.event.addDomListener(infoWindow, 'domready', function() {
 							jQuery('#gd-goGetDirections').click(function() {
 								thisObj.addStop("" + lat + "," + lng);
-								thisObj.computeDirections(document.getElementById('gd-startAddress').value, lat, lng);
+								//figure out if this is first time and start is from infowindow (gd-startAddress) or we are adding a stop / waypoint and start is from gd-startPoint which is default so pass in null for start
+								var start = (document.getElementById('gd-startAddress') !== null) ? document.getElementById('gd-startAddress') : null;
+								thisObj.computeDirections(start, lat, lng);
 								infoWindow.close();
 							});
 						});
