@@ -720,11 +720,16 @@ if ( !class_exists( 'Simple_Map' ) ) {
 						if (thisObj.results === null) {
 							//create div for directions 
 							var el = document.createElement("div");
-							el.id = thisObj.resultsDivI;
+							el.id = thisObj.resultsDivId;
 							insertAfter(document.getElementById( mapContainerId ), el);
 							thisObj.results = el;
 						}
-			
+
+						var startPointDiv = document.createElement("div");
+						startPointDiv.id = thisObj.startPointDivID || "gd-start";
+						startPointDiv.innerHTML = "<input type=\"text\" id=\"gd-startPoint\" />";
+						insertAfter(document.getElementById( mapContainerId ), startPointDiv);
+
 						thisObj.display.setPanel(thisObj.results);
 
 						thisObj.service = new google.maps.DirectionsService();
@@ -739,10 +744,14 @@ if ( !class_exists( 'Simple_Map' ) ) {
 				 */
 				if(typeof(thisObj.computeDirections)==='undefined') {//guarantees one time prototyping 
 					GmapDirections.prototype.computeDirections = function (start, endLat, endLng) {
+						var start = document.getElementById('gd-startPoint').value || start; 
+						document.getElementById('gd-startPoint').value = start;
 						var request = {
 							origin: start, 
 							destination: new google.maps.LatLng(endLat, endLng),
 							waypoints: thisObj.waypoints,
+							optimizeWaypoints: thisObj.optimizeWaypoints || true,
+							provideRouteAlternatives: true,
 							travelMode: thisObj.travelMode || google.maps.DirectionsTravelMode.DRIVING
 						};
 						thisObj.service.route(request, function(response, status) {
