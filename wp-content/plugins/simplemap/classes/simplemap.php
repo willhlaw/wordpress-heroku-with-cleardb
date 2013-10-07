@@ -731,7 +731,7 @@ if ( !class_exists( 'Simple_Map' ) ) {
 
 						var startPointDiv = document.createElement("div");
 						startPointDiv.id = thisObj.startPointDivID || "gd-start";
-						startPointDiv.innerHTML =  "<label for=\"gd-startPoint\">Starting Address:</label>" +
+						startPointDiv.innerHTML =  "<label for=\"gd-startPoint\">Trip's Starting Address:</label>" +
 						"<span contenteditable=\"true\" id=\"gd-startPoint\" style=\"padding: 3px;\" />";
 						insertAfter(document.getElementById( mapContainerId ), startPointDiv);
 
@@ -740,7 +740,7 @@ if ( !class_exists( 'Simple_Map' ) ) {
 						google.maps.event.addListener(directions.display, 'directions_changed', function() {
 							//un-overlap the A and B icons and the start and destination text (which are class .adp-text.
 							setTimeout(function() {
-								$(".adp-text").css('width', 0);
+								jQuery(".adp-text").css('width', 0);
 							}, 1000);
 						});
 
@@ -778,10 +778,14 @@ if ( !class_exists( 'Simple_Map' ) ) {
 
 				if(typeof(thisObj.wrapInfowindow)==='undefined') {//guarantees one time prototyping 
 					GmapDirections.prototype.wrapInfowindow = function (windowContent) {
-						var wrapper = "<div id='wrapper'>" +
-						"<br/><label>Get Directions to here from (enter your starting address):</label>" +
+						var label = "<label>Would you like to go here?</label>";
+						if (!getElementById('gd-startPoint').innerHTML) {
+							//no address has been set, so prompt user inside infowindow for first time
+							label = "<label>Get Directions to here from (enter your starting address):</label>";
+						}
+						var wrapper = "<div id='wrapper'>" + "<br/>" + label + 
 						"<input type=\"text\" id=\"gd-startAddress\" />" +
-						"<input type=\"button\" id=\"gd-goGetDirections\" value=\"go\" />" +
+						"<input type=\"button\" id=\"gd-goGetDirections\" value=\"Add to Trip\" />" +
 						windowContent +
 						"</div>";
 						return wrapper;
@@ -1520,7 +1524,7 @@ if ( !class_exists( 'Simple_Map' ) ) {
 					});
 					infowindow.open(map, marker);
 					infowindowsArray.push(infowindow);
-					window.location = '#map_top';					
+					//window.location = '#map_top';	//GmapDirections author is removing because behavior is not likely to be wanted by end user				
 
 					directions.setDirections(e, infowindow); //sets event listener in GmapDirections object so user can interact with direction buttons inside infowindow
 				});
