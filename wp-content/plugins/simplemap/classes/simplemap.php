@@ -773,7 +773,7 @@ if ( !class_exists( 'Simple_Map' ) ) {
 						var lng = clickedMarkerE.latLng.lng()
 						google.maps.event.addDomListener(infoWindow, 'domready', function() {
 							jQuery('#gd-goGetDirections').click(function() {
-									thisObj.addStops("" + lat + "," + lng);
+									thisObj.addStop("" + lat + "," + lng);
 									thisObj.computeDirections(document.getElementById('gd-startAddress').value, lat, lng);
 									infoWindow.close();
 								});
