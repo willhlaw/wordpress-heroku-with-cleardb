@@ -703,11 +703,12 @@ if ( !class_exists( 'Simple_Map' ) ) {
 				//set options or defaults
 				thisObj.mapContainerId = mapContainerId || 'simplemap';
 				thisObj.directionRendererOpts = options.directionRendererOpts || ({
-					suppressMarkers: true, 
+					suppressMarkers: false, 
 					preserveViewport: false, 
 					draggable: true
 				});
-				thisObj.travelMode = options.travelMode; // use default option later in call, may not be defined here. google.maps.DirectionsTravelMode.DRIVING; //cannot be Transit because multiple waypoints does not work for transit
+				thisObj.travelMode = options.travelMode; // use default option later in call, because google object may not be defined yet. google.maps.DirectionsTravelMode.DRIVING; //cannot be Transit because multiple waypoints does not work for transit
+				thisObj.optimizeWaypoints = options.optimizeWaypoints; // use default option later because google may not be defined.
 				thisObj.resultsDivId = options.resultsDivId || thisObj.mapContainerId + "-results";
 
 				if(typeof(thisObj.setDisplay)==='undefined') {//guarantees one time prototyping 
