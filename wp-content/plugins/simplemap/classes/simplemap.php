@@ -729,12 +729,6 @@ if ( !class_exists( 'Simple_Map' ) ) {
 							thisObj.results = el;
 						}
 
-						var startPointDiv = document.createElement("div");
-						startPointDiv.id = thisObj.startPointDivID || "gd-start";
-						startPointDiv.innerHTML =  "<label for=\"gd-startPoint\">Trip's Starting Address:</label>" +
-						"<span contenteditable=\"true\" id=\"gd-startPoint\" style=\"padding: 3px;\" />";
-						insertAfter(document.getElementById( mapContainerId ), startPointDiv);
-
 						thisObj.display.setPanel(thisObj.results);
 
 						google.maps.event.addListener(directions.display, 'directions_changed', function() {
@@ -756,14 +750,32 @@ if ( !class_exists( 'Simple_Map' ) ) {
 				 */
 				if(typeof(thisObj.computeDirections)==='undefined') {//guarantees one time prototyping 
 					GmapDirections.prototype.computeDirections = function (start, endLat, endLng) {
+
+						//if startPoint does not exist, then create it
+						var gd-startPoint = document.getElementById('gd-startPoint');
+						if (!gd-startPoint) {
+							var startPointDiv = document.createElement("div");
+							startPointDiv.id = thisObj.startPointDivID || "gd-start";
+							startPointDiv.innerHTML =  "<label for=\"gd-startPoint\">Trip's Starting Address (double-click to change):</label>" +
+							"<span contenteditable=\"true\" id=\"gd-startPoint\" style=\"padding: 3px;\" />" +
+							"<input type=\"button\" id=\"gd-reGetDirections\" value=\"Recalculate Trip\" />" +
+							insertAfter(document.getElementById( mapContainerId ), startPointDiv);
+							//add click event to recalculate with new start point with other stops / waypoints the same.
+							jQuery('#gd-reGetDirections').click(function() {
+								thisObj.computeDirections(); //computeDirections handles all the defaults (grabs gd-startPoint from page and uses last waypoint)
+							});
+							gd-startPoint = document.getElementById('gd-startPoint');
+						}
+
 						var start = document.getElementById('gd-startPoint').innerHTML || start; 
-						document.getElementById('gd-startPoint').innerHTML = start;
-						//need to remove the last waypoint because it is our desintation
-						var stopPoints = thisObj.waypoints;
+						document.getElementById('gd-startPoint').innerHTML = start; //sets it in case it is the first address from infowindow
+						//need to remove the last waypoint because it is the same as our desintation
+						var stopPoints = thisObj.waypoints.slice(0); //essentially clones the array doing a shallow copy
 						stopPoints.length = stopPoints.length - 1;
+
 						var request = {
 							origin: start, 
-							destination: new google.maps.LatLng(endLat, endLng),
+							destination: (endLng !== undefined) ? new google.maps.LatLng(endLat, endLng): thisObj.waypoints[thisObj.waypoints.length-1].location, /*use last waypoint if no end points were passed in */
 							waypoints: stopPoints,
 							optimizeWaypoints: thisObj.optimizeWaypoints || true,
 							provideRouteAlternatives: true,
@@ -774,20 +786,23 @@ if ( !class_exists( 'Simple_Map' ) ) {
 								thisObj.display.setDirections(response);
 							} else {
 								alert('Error generating directions. Please try entering another address.');
+								gd-startPoint.innerHTML = "Please try another address";
 							}
 						});
+
 					} // end computeDirections
 				}
 
 				if(typeof(thisObj.wrapInfowindow)==='undefined') {//guarantees one time prototyping 
 					GmapDirections.prototype.wrapInfowindow = function (windowContent) {
 						var label = "<label>Would you like to go here?</label>";
-						if (!document.getElementById('gd-startPoint').innerHTML) {
+						var input = "";
+						if (!document.getElementById('gd-startPoint') || !document.getElementById('gd-startPoint').innerHTML) {
 							//no address has been set, so prompt user inside infowindow for first time
 							label = "<label>Would you like to go here? (Enter your starting address):</label>";
+							input = "<input type=\"text\" id=\"gd-startAddress\" />";
 						}
-						var wrapper = "<div id='wrapper'>" + "<br/>" + label + 
-						"<input type=\"text\" id=\"gd-startAddress\" />" +
+						var wrapper = "<div id='wrapper'>" + "<br/>" + label + input + 
 						"<input type=\"button\" id=\"gd-goGetDirections\" value=\"Add to Trip\" />" +
 						windowContent +
 						"</div>";
@@ -801,11 +816,11 @@ if ( !class_exists( 'Simple_Map' ) ) {
 						var lng = clickedMarkerE.latLng.lng()
 						google.maps.event.addDomListener(infoWindow, 'domready', function() {
 							jQuery('#gd-goGetDirections').click(function() {
-									thisObj.addStop("" + lat + "," + lng);
-									thisObj.computeDirections(document.getElementById('gd-startAddress').value, lat, lng);
-									infoWindow.close();
-								});
+								thisObj.addStop("" + lat + "," + lng);
+								thisObj.computeDirections(document.getElementById('gd-startAddress').value, lat, lng);
+								infoWindow.close();
 							});
+						});
 					}
 				}
 
