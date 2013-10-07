@@ -744,9 +744,9 @@ if ( !class_exists( 'Simple_Map' ) ) {
 
 				/**
 				 * Get the directions from google
-				 * @param string start (start address)
-				 * @param integer endLat
-				 * @param integer endLng
+				 * @param string start (start address) //defaults to on page startPoint address
+				 * @param integer endLat  //number from placemark. But it could be an Address string
+				 * @param integer endLng  //number from placemark. But if endLat is an address, this value should be "address" as an indicator.
 				 */
 				if(typeof(thisObj.computeDirections)==='undefined') {//guarantees one time prototyping 
 					GmapDirections.prototype.computeDirections = function (start, endLat, endLng) {
@@ -758,11 +758,11 @@ if ( !class_exists( 'Simple_Map' ) ) {
 							var startPointDiv = document.createElement("div");
 							startPointDiv.id = thisObj.startPointDivID || "gd-start";
 							startPointDiv.innerHTML =  "<label for=\"gd-startPoint\">Your trip's starting address:</label>" +
-							"<span contenteditable=\"true\" id=\"gd-startPoint\" style=\"padding: 3px; background-color: lightgray\" />" +
-							"<input type=\"button\" id=\"gd-reGetDirections\" value=\"Recalculate Trip\" />";
+							"<span contenteditable=\"true\" id=\"gd-startPoint\" style=\"padding: 3px; background-color: #ddd\; margin-top: 4px" />" +
+							"<input type=\"button\" id=\"gd-reGetDirections\" value=\"Recalculate Trip\" />" + "<br/>";
 							insertAfter(document.getElementById( mapContainerId ), startPointDiv);
 							//add click event to recalculate with new start point with other stops / waypoints the same.
-							jQuery('.gd-reGetDirections').click(function() {
+							jQuery('#gd-reGetDirections').click(function() {
 								thisObj.computeDirections(); //computeDirections handles all the defaults (grabs gd-startPoint from page and uses last waypoint)
 							});
 							startPoint = document.getElementById('gd-startPoint');
@@ -775,7 +775,7 @@ if ( !class_exists( 'Simple_Map' ) ) {
 						//need to remove the last waypoint because it is the same as our destination, and destination is required
 						var stopPoints = thisObj.waypoints.slice(0); //essentially clones the array doing a shallow copy
 						stopPoints.length = stopPoints.length - 1;
-						var endPoint = (!endLng) ? thisObj.waypoints[thisObj.waypoints.length-1].location : new google.maps.LatLng(endLat, endLng); //use last waypoint if no end points were passed in
+						var endPoint = (!endLng) ? thisObj.waypoints[thisObj.waypoints.length-1].location : ((endLng === "address") ? endLat : new google.maps.LatLng(endLat, endLng)); //use last waypoint if no end points were passed in. If endLng was "address", then second parameter endLng is address string (for case when link is clicked)
 						var request = {
 							origin: startAddress, 
 							destination: endPoint,
@@ -1650,7 +1650,8 @@ if ( !class_exists( 'Simple_Map' ) ) {
 					if (locationData.country) { if ( '' != dir_address2 ) { dir_address2 += ' '; } dir_address2 += locationData.country };
 					if ( '' != dir_address2 ) { dir_address += '(' + escape( dir_address2 ) + ')' };
 
-					html += '<a class="result_directions" href="http://google' + default_domain + '/maps?saddr=' + searchData.homeAddress + '&daddr=' + dir_address + '" target="_blank">' + get_directions_text + '</a>';
+					//html += '<a class="result_directions" href="http://google' + default_domain + '/maps?saddr=' + searchData.homeAddress + '&daddr=' + dir_address + '" target="_blank">' + get_directions_text + '</a>';
+					html += '<a class="result_directions" href="" onclick='directions.computeDirections(null, dir_address, 'address')'>' + Add to Trip + '</a>'; //Custom injection for GmapDirections so instead of new page, user can add the site as a stop / waypoint on the map
 				}
 				html += '</div>';
 				html += '<div style="clear: both;"></div>';
