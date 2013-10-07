@@ -779,9 +779,9 @@ if ( !class_exists( 'Simple_Map' ) ) {
 				if(typeof(thisObj.wrapInfowindow)==='undefined') {//guarantees one time prototyping 
 					GmapDirections.prototype.wrapInfowindow = function (windowContent) {
 						var label = "<label>Would you like to go here?</label>";
-						if (!getElementById('gd-startPoint').innerHTML) {
+						if (!document.getElementById('gd-startPoint').innerHTML) {
 							//no address has been set, so prompt user inside infowindow for first time
-							label = "<label>Get Directions to here from (enter your starting address):</label>";
+							label = "<label>Would you like to go here? (Enter your trip's starting address):</label>";
 						}
 						var wrapper = "<div id='wrapper'>" + "<br/>" + label + 
 						"<input type=\"text\" id=\"gd-startAddress\" />" +
