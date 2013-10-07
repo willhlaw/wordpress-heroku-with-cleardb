@@ -1500,9 +1500,9 @@ if ( !class_exists( 'Simple_Map' ) ) {
 					infowindow.open(map, marker);
 					infowindowsArray.push(infowindow);
 					window.location = '#map_top';					
-				});
 
-				directions.setDirections(e, infowindow); //sets event listener in GmapDirections object so user can interact with direction buttons inside infowindow
+					directions.setDirections(e, infowindow); //sets event listener in GmapDirections object so user can interact with direction buttons inside infowindow
+				});
 
 				return marker;
 			}
