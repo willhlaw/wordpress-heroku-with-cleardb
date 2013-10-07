@@ -752,8 +752,8 @@ if ( !class_exists( 'Simple_Map' ) ) {
 					GmapDirections.prototype.computeDirections = function (start, endLat, endLng) {
 
 						//if startPoint does not exist, then create it
-						var gd-startPoint = document.getElementById('gd-startPoint');
-						if (!gd-startPoint) {
+						var startPoint = document.getElementById('gd-startPoint');
+						if (!startPoint) {
 							var startPointDiv = document.createElement("div");
 							startPointDiv.id = thisObj.startPointDivID || "gd-start";
 							startPointDiv.innerHTML =  "<label for=\"gd-startPoint\">Trip's Starting Address (double-click to change):</label>" +
@@ -764,7 +764,7 @@ if ( !class_exists( 'Simple_Map' ) ) {
 							jQuery('#gd-reGetDirections').click(function() {
 								thisObj.computeDirections(); //computeDirections handles all the defaults (grabs gd-startPoint from page and uses last waypoint)
 							});
-							gd-startPoint = document.getElementById('gd-startPoint');
+							startPoint = document.getElementById('gd-startPoint');
 						}
 
 						var start = document.getElementById('gd-startPoint').innerHTML || start; 
@@ -786,7 +786,7 @@ if ( !class_exists( 'Simple_Map' ) ) {
 								thisObj.display.setDirections(response);
 							} else {
 								alert('Error generating directions. Please try entering another address.');
-								gd-startPoint.innerHTML = "Please try another address";
+								startPoint.innerHTML = "Please try another address";
 							}
 						});
 
