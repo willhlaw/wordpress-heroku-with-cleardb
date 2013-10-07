@@ -772,10 +772,10 @@ if ( !class_exists( 'Simple_Map' ) ) {
 						//need to remove the last waypoint because it is the same as our desintation
 						var stopPoints = thisObj.waypoints.slice(0); //essentially clones the array doing a shallow copy
 						stopPoints.length = stopPoints.length - 1;
-
+						var endPoint = (!endLng) ? thisObj.waypoints[thisObj.waypoints.length-1].location : new google.maps.LatLng(endLat, endLng); //use last waypoint if no end points were passed in
 						var request = {
 							origin: start, 
-							destination: (endLng !== undefined) ? new google.maps.LatLng(endLat, endLng): thisObj.waypoints[thisObj.waypoints.length-1].location, /*use last waypoint if no end points were passed in */
+							destination: endPoint,
 							waypoints: stopPoints,
 							optimizeWaypoints: thisObj.optimizeWaypoints || true,
 							provideRouteAlternatives: true,
