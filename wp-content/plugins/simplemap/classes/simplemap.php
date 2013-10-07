@@ -758,10 +758,13 @@ if ( !class_exists( 'Simple_Map' ) ) {
 					GmapDirections.prototype.computeDirections = function (start, endLat, endLng) {
 						var start = document.getElementById('gd-startPoint').innerHTML || start; 
 						document.getElementById('gd-startPoint').innerHTML = start;
+						//need to remove the last waypoint because it is our desintation
+						var stopPoints = thisObj.waypoints;
+						stopPoints.length = stopPoints.length - 1;
 						var request = {
 							origin: start, 
 							destination: new google.maps.LatLng(endLat, endLng),
-							waypoints: thisObj.waypoints,
+							waypoints: stopPoints,
 							optimizeWaypoints: thisObj.optimizeWaypoints || true,
 							provideRouteAlternatives: true,
 							travelMode: thisObj.travelMode || google.maps.DirectionsTravelMode.DRIVING
@@ -781,7 +784,7 @@ if ( !class_exists( 'Simple_Map' ) ) {
 						var label = "<label>Would you like to go here?</label>";
 						if (!document.getElementById('gd-startPoint').innerHTML) {
 							//no address has been set, so prompt user inside infowindow for first time
-							label = "<label>Would you like to go here? (Enter your trip's starting address):</label>";
+							label = "<label>Would you like to go here? (Enter your starting address):</label>";
 						}
 						var wrapper = "<div id='wrapper'>" + "<br/>" + label + 
 						"<input type=\"text\" id=\"gd-startAddress\" />" +
