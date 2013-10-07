@@ -1494,7 +1494,7 @@ if ( !class_exists( 'Simple_Map' ) ) {
 					clearInfoWindows();
 					var infowindow = new google.maps.InfoWindow({
 						maxWidth: maxbubblewidth,
-						content: directions.wrapInfowindow(html); //inserts logic from GmapDirections object so user can ask for directions with multiple routes
+						content: directions.wrapInfowindow(html) /*inserts logic from GmapDirections object so user can ask for directions with multiple routes */
 					});
 					infowindow.open(map, marker);
 					infowindowsArray.push(infowindow);
