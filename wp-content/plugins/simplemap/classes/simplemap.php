@@ -691,6 +691,7 @@ if ( !class_exists( 'Simple_Map' ) ) {
 			//var directionsService;
 			//var directionsResults;
 
+			//Dependencies: jQuery and Google.maps object needs to be instantiated.
 			function GmapDirections(mapContainerId, options) {
 				var thisObj = this; //so that this can be bound to something in an event handler
 				var options = options || {}; //prevents undefined errors if no options parameter is passed in. (e.g. options.option1 will no longer complain about opdtions object being undefined)
@@ -706,7 +707,7 @@ if ( !class_exists( 'Simple_Map' ) ) {
 					preserveViewport: false, 
 					draggable: true
 				});
-				thisObj.travelMode = options.travelMode || google.maps.DirectionsTravelMode.DRIVING; //cannot be Transit because multiple waypoints does not work for transit
+				thisObj.travelMode = options.travelMode; // use default option later in call, may not be defined here. google.maps.DirectionsTravelMode.DRIVING; //cannot be Transit because multiple waypoints does not work for transit
 				thisObj.resultsDivId = options.resultsDivId || thisObj.mapContainerId + "-results";
 
 				if(typeof(thisObj.setDisplay)==='undefined') {//guarantees one time prototyping 
@@ -742,7 +743,7 @@ if ( !class_exists( 'Simple_Map' ) ) {
 							origin: start, 
 							destination: new google.maps.LatLng(endLat, endLng),
 							waypoints: thisObj.waypoints,
-							travelMode: thisObj.travelMode
+							travelMode: thisObj.travelMode || google.maps.DirectionsTravelMode.DRIVING
 						};
 						thisObj.service.route(request, function(response, status) {
 							if (status == google.maps.DirectionsStatus.OK) {
