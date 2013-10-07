@@ -757,9 +757,9 @@ if ( !class_exists( 'Simple_Map' ) ) {
 						if (!startPoint) {
 							var startPointDiv = document.createElement("div");
 							startPointDiv.id = thisObj.startPointDivID || "gd-start";
-							startPointDiv.innerHTML =  "<label for=\"gd-startPoint\">Your trip's starting address:</label>" +
-							"<span contenteditable=\"true\" id=\"gd-startPoint\" style=\"padding: 3px; background-color: #ddd\; margin-top: 4px" />" +
-							"<input type=\"button\" id=\"gd-reGetDirections\" value=\"Recalculate Trip\" />" + "<br/>";
+							startPointDiv.innerHTML =  "<label for='gd-startPoint'>Your trip's starting address:</label>" +
+							"<span contenteditable='true' id='gd-startPoint' style='padding: 3px; background-color: #ddd; margin-top: 4px' />" +
+							"<input type='button' id='gd-reGetDirections' value='Recalculate Trip' />" + "<br/>";
 							insertAfter(document.getElementById( mapContainerId ), startPointDiv);
 							//add click event to recalculate with new start point with other stops / waypoints the same.
 							jQuery('#gd-reGetDirections').click(function() {
@@ -803,10 +803,10 @@ if ( !class_exists( 'Simple_Map' ) ) {
 						if (!document.getElementById('gd-startPoint') || !document.getElementById('gd-startPoint').innerHTML) {
 							//no address has been set, so prompt user inside infowindow for first time
 							label = "<label>Would you like to go here? (Enter your starting address):</label>";
-							input = "<input type=\"text\" id=\"gd-startAddress\" />";
+							input = "<input type='text' id='gd-startAddress' />";
 						}
 						var wrapper = "<div id='wrapper'>" + "<br/>" + label + input + 
-						"<input type=\"button\" id=\"gd-goGetDirections\" value=\"Add to Trip\" />" +
+						"<input type='button' id='gd-goGetDirections' value='Add to Trip' />" +
 						windowContent +
 						"</div>";
 						return wrapper;
