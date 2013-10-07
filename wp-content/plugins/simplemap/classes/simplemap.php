@@ -728,7 +728,8 @@ if ( !class_exists( 'Simple_Map' ) ) {
 
 						var startPointDiv = document.createElement("div");
 						startPointDiv.id = thisObj.startPointDivID || "gd-start";
-						startPointDiv.innerHTML = "<input type=\"text\" id=\"gd-startPoint\" />";
+						startPointDiv.innerHTML =  "<label for=\"gd-startPoint\">Starting Address:</label>+
+						"<span contenteditable=\"true\" id=\"gd-startPoint\" style=\"padding: 3px;\" />";
 						insertAfter(document.getElementById( mapContainerId ), startPointDiv);
 
 						thisObj.display.setPanel(thisObj.results);
@@ -745,8 +746,8 @@ if ( !class_exists( 'Simple_Map' ) ) {
 				 */
 				if(typeof(thisObj.computeDirections)==='undefined') {//guarantees one time prototyping 
 					GmapDirections.prototype.computeDirections = function (start, endLat, endLng) {
-						var start = document.getElementById('gd-startPoint').value || start; 
-						document.getElementById('gd-startPoint').value = start;
+						var start = document.getElementById('gd-startPoint').innerHTML || start; 
+						document.getElementById('gd-startPoint').innerHTML = start;
 						var request = {
 							origin: start, 
 							destination: new google.maps.LatLng(endLat, endLng),
@@ -768,7 +769,7 @@ if ( !class_exists( 'Simple_Map' ) ) {
 				if(typeof(thisObj.wrapInfowindow)==='undefined') {//guarantees one time prototyping 
 					GmapDirections.prototype.wrapInfowindow = function (windowContent) {
 						var wrapper = "<div id='wrapper'>" +
-						"<br/><label>Get Directions to here from:</label>" +
+						"<br/><label>Get Directions to here from (enter your starting address):</label>" +
 						"<input type=\"text\" id=\"gd-startAddress\" />" +
 						"<input type=\"button\" id=\"gd-goGetDirections\" value=\"go\" />" +
 						windowContent +
