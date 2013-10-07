@@ -687,35 +687,154 @@ if ( !class_exists( 'Simple_Map' ) ) {
 			var markersArray = [];
 			var infowindowsArray = [];
 
-			var directionsDisplay;
-			var directionsService;
-			var directionsResults;
+			//var directionsDisplay;
+			//var directionsService;
+			//var directionsResults;
 
-			var directionWaypoints = function() {
-				waypoints : [],
-				add : function (latlngString, stopOverFlag) {
-					var stopOver = stopOverFlag || true;
-					waypoints.push({
+			function GmapDirections(mapContainerId, options) {
+				var thisObj = this; //so that this can be bound to something in an event handler
+				var options = options || {}; //prevents undefined errors if no options parameter is passed in. (e.g. options.option1 will no longer complain about opdtions object being undefined)
+				thisObj.display = null; //Google DirectionsRenderer object
+				thisObj.service = null; //Google DirectionsServive object
+				thisObj.resultsDiv = null; //where results from Google Directions API html will be put
+				thisObj.resultsDivId = null; 
+
+				//set options or defaults
+				thisObj.mapContainerId = mapContainerId || 'simplemap';
+				thisObj.directionRendererOpts = options.directionRendererOpts || ({
+					suppressMarkers: true, 
+					preserveViewport: false, 
+					draggable: true
+				});
+				thisObj.travelMode = options.travelMode || google.maps.DirectionsTravelMode.DRIVING; //cannot be Transit because multiple waypoints does not work for transit
+				thisObj.resultsDivId = options.resultsDivId || thisObj.mapContainerId + "-results";
+
+				if(typeof(thisObj.setDisplay)==='undefined') {//guarantees one time prototyping 
+					GmapDirections.prototype.setDisplay = function (map) {
+						thisObj.display = new google.maps.DirectionsRenderer(thisObj.directionRendererOpts);
+						thisObj.display.setMap(map);
+
+						//get or create a div to populate the directions
+						thisObj.results = document.getElementById(thisObj.resultsDivId);
+						if (thisObj.results === null) {
+							//create div for directions 
+							var el = document.createElement("div");
+							el.id = thisObj.resultsDivI;
+							insertAfter(document.getElementById( mapContainerId ), el);
+							thisObj.results = el;
+						}
+			
+						thisObj.display.setPanel(thisObj.results);
+
+						thisObj.service = new google.maps.DirectionsService();
+					}
+				}
+
+				/**
+				 * Get the directions from google
+				 * @param string start (start address)
+				 * @param integer endLat
+				 * @param integer endLng
+				 */
+				if(typeof(thisObj.computeDirections)==='undefined') {//guarantees one time prototyping 
+					GmapDirections.prototype.computeDirections = function (start, endLat, endLng) {
+						var request = {
+							origin: start, 
+							destination: new google.maps.LatLng(endLat, endLng),
+							waypoints: thisObj.waypoints,
+							travelMode: thisObj.travelMode
+						};
+						thisObj.service.route(request, function(response, status) {
+							if (status == google.maps.DirectionsStatus.OK) {
+								thisObj.display.setDirections(response);
+							} else {
+								alert('Error generating directions. Please try entering another address.');
+							}
+						});
+					} // end computeDirections
+				}
+
+				if(typeof(thisObj.wrapInfowindow)==='undefined') {//guarantees one time prototyping 
+					GmapDirections.prototype.wrapInfowindow = function (windowContent) {
+						var wrapper = "<div id='wrapper'>" +
+						"<br/><label>Get Directions to here from:</label>" +
+						"<input type=\"text\" id=\"gd-startAddress\" />" +
+						"<input type=\"button\" id=\"gd-goGetDirections\" value=\"go\" />" +
+						windowContent +
+						"</div>";
+						return wrapper;
+					}
+				}
+
+				if(typeof(thisObj.setDirections)==='undefined') {//guarantees one time prototyping 
+					GmapDirections.prototype.setDirections = function (clickedMarkerE, infoWindow) {
+						var lat = clickedMarkerE.latLng.lat();
+						var lng = clickedMarkerE.latLng.lng()
+						google.maps.event.addDomListener(infoWindow, 'domready', function() {
+							jQuery('#gd-goGetDirections').click(function() {
+									thisObj.addStops("" + lat + "," + lng);
+									thisObj.computeDirections(document.getElementById('gd-startAddress').value, lat, lng);
+									infoWindow.close();
+								});
+							});
+					}
+				}
+
+				/************ Functions for managing waypoints or "Stops" along the route ***************/
+
+				// Array Remove - By John Resig (MIT Licensed)
+                Array.prototype.remove = function(from, to) {
+                	var rest = this.slice((to || from) + 1 || this.length);
+                	this.length = from < 0 ? this.length + from : from;
+                	return this.push.apply(this, rest);
+                };
+				thisObj.waypoints = new Array();
+
+				if(typeof(thisObj.getStops)==='undefined') {//guarantees one time prototyping 
+					GmapDirections.prototype.getStops = function () {
+						return thisObj.waypoints;
+					}
+				}
+
+				if(typeof(thisObj.setStops)==='undefined') {//guarantees one time prototyping 
+					GmapDirections.prototype.setStops = function (directionWaypoints) {
+						thisObj.waypoints = directionWaypoints;
+					}
+				}
+
+				if(typeof(thisObj.addStop)==='undefined') {//guarantees one time prototyping 
+					GmapDirections.prototype.addStop = function(latlngString, stopOverFlag) {
+						var stopOver = stopOverFlag || true; //default is true, to add waypoint to route as a marker
+						thisObj.waypoints.push({
 						location: latlngString,
 						stopover: stopOver
+						});
+					};
+  				}
 
-					})
-				},
-				remove : function (latlngString) {
-					var length = waypoints.length;
-					var index = -1;
-					for (int i = 0; i < l; i++) {
-						if (waypoints[i].location === latlngString) {
-							index = i;
-							break;
+  				if(typeof(thisObj.removeStop)==='undefined') { //guarantees one time prototyping 
+  					GmapDirections.prototype.removeStop = function(latlngStringOrIndex) {
+						var index = -1;
+
+						if (typeof latlngStringOrIndex !== "number") {
+							//parameter was a latlng string "32.34, -77.23"
+	  						for (var i = thisObj.waypoints.length - 1; i >= 0; i--) {
+								if (thisObj.waypoints[i].location === latlngStringOrIndex) {
+									index = i;
+									thisObj.waypoints.remove(index);
+									break;
+								}
+							}
+						} else {
+							//parameter was an index "3" or "-1" for the last one
+							thisObj.waypoints.remove(index);
 						}
-					}
-					if (index != -1) {
-						waypoints.slice(index, 1);
-					}
-					return index;
-				}
-			};
+						return index;
+	  				};
+  				}
+			} // end of GmapDirections 'class'
+
+			directions = new GmapDirections('simplemap'); //creates new GmapDirections object to allow user to get directions between different markers (a.k.a. stops or waypoints)
 
 			function clearInfoWindows() {
 				if (infowindowsArray) {
@@ -771,22 +890,7 @@ if ( !class_exists( 'Simple_Map' ) ) {
 
 
 				map = new google.maps.Map( document.getElementById( "simplemap" ), myOptions );
-				directionsDisplay = new google.maps.DirectionsRenderer({suppressMarkers: true, preserveViewport: false, draggable: true});
-				directionsDisplay.setMap(map);
-
-				//get or create a div to populate the directions
-				var directionsResults = document.getElementById('simplemap-directions');
-				if (directionsResults === null) {
-					//create div for directions 
-					var el = document.createElement("div");
-					el.id = "simplemap-directions";
-					insertAfter(document.getElementById( "simplemap" ), el);
-					directionsResults = el;
-				}
-			
-				directionsDisplay.setPanel(directionsResults);
-
-				directionsService = new google.maps.DirectionsService();
+				directions.setDisplay(map); //prepare for Google Directions API calls by using GmapDirections object
 
 				// Adsense for Google Maps
 				<?php 
@@ -1206,29 +1310,7 @@ if ( !class_exists( 'Simple_Map' ) ) {
 				return returnString;
 			}
 
-				/**
-			 * Get the directions from google
-			 * @author Will Lawrence <will.lawrence@gmail.com>
-			 * @param string start (start address)
-			 * @param integer endLat
-			 * @param integer endLng
-			 */
-			function computeDirections(start, endlat, endlng) {
-				var request = {
-					origin: start, 
-					destination: new google.maps.LatLng(endlat, endlng),
-					waypoints: directionsWaypoints.waypoints,
-					travelMode: google.maps.DirectionsTravelMode.DRIVING
-				};
-				directionsService.route(request, function(response, status) {
-					if (status == google.maps.DirectionsStatus.OK) {
-						directionsDisplay.setDirections(response);
-					} else {
-						alert('Error generating directions. Please try entering another address.');
-					}
-				});
-			}
-
+			
 			function createMarker( locationData ) {
 
 				// Init tax heights
@@ -1408,33 +1490,22 @@ if ( !class_exists( 'Simple_Map' ) ) {
 
 				html += '	</div>';
 
-				var htmlWrapper = "<div id='wrapper'>" +
-					"<br/><label>Get Directions to here from:</label>" +
-					"<input type=\"text\" id=\"startAddress\" />" +
-					"<input type=\"button\" id=\"goGetDirections\" value=\"go\" />" +
-					html +
-					"</div>";
-
 				google.maps.event.addListener(marker, 'click', function(e) {
 					clearInfoWindows();
 					var infowindow = new google.maps.InfoWindow({
 						maxWidth: maxbubblewidth,
-						content: htmlWrapper
+						content: directions.wrapInfowindow(html); //inserts logic from GmapDirections object so user can ask for directions with multiple routes
 					});
 					infowindow.open(map, marker);
 					infowindowsArray.push(infowindow);
-					window.location = '#map_top';
-					google.maps.event.addDomListener(infowindow, 'domready', function() {
-						jQuery('#goGetDirections').click(function() {
-							directionsWaypoints.add("" + e.latLng.lat() + "," + e.latLng.lng());
-							computeDirections(document.getElementById('startAddress').value, e.latLng.lat() , e.latLng.lng());
-							infowindow.close();
-						});
-					});					
+					window.location = '#map_top';					
 				});
+
+				directions.setDirections(e, infowindow); //sets event listener in GmapDirections object so user can interact with direction buttons inside infowindow
 
 				return marker;
 			}
+
 
 			function createSidebarEntry(marker, locationData, searchData) {
 				var div = document.createElement('div');
