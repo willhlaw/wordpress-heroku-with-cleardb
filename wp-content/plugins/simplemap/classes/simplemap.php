@@ -691,7 +691,10 @@ if ( !class_exists( 'Simple_Map' ) ) {
 			//var directionsService;
 			//var directionsResults;
 
-			//Dependencies: jQuery and Google.maps object needs to be instantiated.
+			/* Function: GmapDirections class
+			 * Author: Will Lawrence <will.lawrence [at] gmail>
+			 * Dependencies: jQuery and Google.maps object needs to be instantiated.
+			 */
 			function GmapDirections(mapContainerId, options) {
 				var thisObj = this; //so that this can be bound to something in an event handler
 				var options = options || {}; //prevents undefined errors if no options parameter is passed in. (e.g. options.option1 will no longer complain about opdtions object being undefined)
@@ -728,11 +731,18 @@ if ( !class_exists( 'Simple_Map' ) ) {
 
 						var startPointDiv = document.createElement("div");
 						startPointDiv.id = thisObj.startPointDivID || "gd-start";
-						startPointDiv.innerHTML =  "<label for=\"gd-startPoint\">Starting Address:</label>+
+						startPointDiv.innerHTML =  "<label for=\"gd-startPoint\">Starting Address:</label>" +
 						"<span contenteditable=\"true\" id=\"gd-startPoint\" style=\"padding: 3px;\" />";
 						insertAfter(document.getElementById( mapContainerId ), startPointDiv);
 
 						thisObj.display.setPanel(thisObj.results);
+
+						google.maps.event.addListener(directions.display, 'directions_changed', function() {
+							//un-overlap the A and B icons and the start and destination text (which are class .adp-text.
+							setTimeout(function() {
+								$(".adp-text").css('width', 0);
+							}, 1000);
+						});
 
 						thisObj.service = new google.maps.DirectionsService();
 					}
