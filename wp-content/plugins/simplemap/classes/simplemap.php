@@ -798,15 +798,18 @@ if ( !class_exists( 'Simple_Map' ) ) {
 
 				if(typeof(thisObj.wrapInfowindow)==='undefined') {//guarantees one time prototyping 
 					GmapDirections.prototype.wrapInfowindow = function (windowContent) {
+						//set up default values for case when user has already chosen a startPoint and at least one stop / waypoint
 						var label = "<label>Would you like to go here?</label>";
 						var input = "";
+						var addButton = "<input type='button' id='gd-goGetDirections' value='Add to Trip' />";
+						var removeButton = ""<input type='button' id='gd-removeAndGetDirections' value='Drop from Trip' />";";
 						if (!document.getElementById('gd-startPoint') || !document.getElementById('gd-startPoint').innerHTML) {
 							//no address has been set, so prompt user inside infowindow for first time
 							label = "<label>Would you like to go here? (Enter your starting address):</label>";
 							input = "<input type='text' id='gd-startAddress' />";
+							removeButton = "";
 						}
-						var wrapper = "<div id='wrapper'>" + "<br/>" + label + input + 
-						"<input type='button' id='gd-goGetDirections' value='Add to Trip' />" +
+						var wrapper = "<div id='wrapper'>" + "<br/>" + label + input + addButton + removeButton +
 						windowContent +
 						"</div>";
 						return wrapper;
@@ -823,6 +826,14 @@ if ( !class_exists( 'Simple_Map' ) ) {
 								//figure out if this is first time and start is from infowindow (gd-startAddress) or we are adding a stop / waypoint and start is from gd-startPoint which is default so pass in null for start
 								var start = (document.getElementById('gd-startAddress') !== null) ? document.getElementById('gd-startAddress').value : null;
 								thisObj.computeDirections(start, lat, lng);
+								infoWindow.close();
+							});
+						});
+						google.maps.event.addDomListener(infoWindow, 'domready', function() {
+							jQuery('#gd-removeAndGetDirections').click(function() {
+								thisObj.removeStop("" + lat + "," + lng);
+								//remove a stop / waypoint so start will from gd-startPoint which is default so pass in null for start and nothing for lat and lng because we want waypoint to be used
+								thisObj.computeDirections();
 								infoWindow.close();
 							});
 						});
