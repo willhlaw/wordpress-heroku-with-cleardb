@@ -812,7 +812,7 @@ if ( !class_exists( 'Simple_Map' ) ) {
 						}
 						var wrapper = "<div id='wrapper'>" + "<br/>" + label + input + addButton + removeButton +
 						windowContent +
-						"</div>";
+						"<hr></div>";
 						return wrapper;
 					}
 				}
@@ -1559,7 +1559,7 @@ if ( !class_exists( 'Simple_Map' ) ) {
 					});
 					infowindow.open(map, marker);
 					infowindowsArray.push(infowindow);
-					//window.location = '#map_top';	//GmapDirections author is removing because behavior is not likely to be wanted by end user				
+					window.location = '#map_top';	//Need this when results div below map are clicked so user can focus on window that just opened. But, GmapDirections author is considering removing because behavior is not likely to be wanted by end user				
 
 					directions.setDirections(this, infowindow); //'this' refers to marker which has position information and this call sets event listener in GmapDirections object so user can interact with direction buttons inside infowindow
 				});
