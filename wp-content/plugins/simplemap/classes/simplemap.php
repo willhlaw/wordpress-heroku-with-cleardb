@@ -810,9 +810,10 @@ if ( !class_exists( 'Simple_Map' ) ) {
 							input = "<input type='text' id='gd-startAddress' />";
 							removeButton = "";
 						}
-						var wrapper = "<div id='wrapper'>" + "<br/>" + label + input + addButton + removeButton +
+						var wrapper = "<div id='wrapper'>" + "<br/>" + label + input + addButton + removeButton + 
+						"<hr>" +
 						windowContent +
-						"<hr></div>";
+						"</div>";
 						return wrapper;
 					}
 				}
