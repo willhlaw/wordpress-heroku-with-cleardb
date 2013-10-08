@@ -757,7 +757,7 @@ if ( !class_exists( 'Simple_Map' ) ) {
 						if (!startPoint) {
 							var startPointDiv = document.createElement("div");
 							startPointDiv.id = thisObj.startPointDivID || "gd-start";
-							startPointDiv.innerHTML =  "<table style='margin-top: 3px'><tr><td>" + "<label for='gd-startPoint'>Your trip's starting address:</label>" + "</td>" +
+							startPointDiv.innerHTML =  "<table style='width: 0'><tr><td>" + "<label for='gd-startPoint'>Your trip's starting address:</label>" + "</td>" +
 							"<td>" + "<span contenteditable='true' id='gd-startPoint' style='padding: 3px; border: 1px solid #ddd; margin-top: 4px' />" + "</td>" +
 							"<td>" + "<input type='button' id='gd-reGetDirections' value='Recalculate Trip' />" + "</td></tr></table>" + 
 							"<br/>";
@@ -818,9 +818,9 @@ if ( !class_exists( 'Simple_Map' ) ) {
 				}
 
 				if(typeof(thisObj.setDirections)==='undefined') {//guarantees one time prototyping 
-					GmapDirections.prototype.setDirections = function (clickedMarkerE, infoWindow) {
-						var lat = clickedMarkerE.latLng.lat();
-						var lng = clickedMarkerE.latLng.lng()
+					GmapDirections.prototype.setDirections = function (clickedMarker, infoWindow) {
+						var lat = clickedMarker.position.lat();
+						var lng = clickedMarker.position.lng()
 						google.maps.event.addDomListener(infoWindow, 'domready', function() {
 							jQuery('#gd-goGetDirections').click(function() {
 								thisObj.addStop("" + lat + "," + lng);
@@ -1561,7 +1561,7 @@ if ( !class_exists( 'Simple_Map' ) ) {
 					infowindowsArray.push(infowindow);
 					//window.location = '#map_top';	//GmapDirections author is removing because behavior is not likely to be wanted by end user				
 
-					directions.setDirections(e, infowindow); //sets event listener in GmapDirections object so user can interact with direction buttons inside infowindow
+					directions.setDirections(this, infowindow); //'this' refers to marker which has position information and this call sets event listener in GmapDirections object so user can interact with direction buttons inside infowindow
 				});
 
 				return marker;
