@@ -757,9 +757,9 @@ if ( !class_exists( 'Simple_Map' ) ) {
 						if (!startPoint) {
 							var startPointDiv = document.createElement("div");
 							startPointDiv.id = thisObj.startPointDivID || "gd-start";
-							startPointDiv.innerHTML =  "<label for='gd-startPoint'>Your trip's starting address:</label>" +
-							"<input type='button' id='gd-reGetDirections' value='Recalculate Trip' />" + 
-							"<span contenteditable='true' id='gd-startPoint' style='padding: 3px; background-color: #ddd; margin-top: 4px' />" +
+							startPointDiv.innerHTML =  "<table style='margin-top: 3px'><tr><td>" + "<label for='gd-startPoint'>Your trip's starting address:</label>" + "</td>" +
+							"<td>" + "<span contenteditable='true' id='gd-startPoint' style='padding: 3px; border: 1px solid #ddd; margin-top: 4px' />" + "</td>" +
+							"<td>" + "<input type='button' id='gd-reGetDirections' value='Recalculate Trip' />" + "</td></tr></table>" + 
 							"<br/>";
 							insertAfter(document.getElementById( mapContainerId ), startPointDiv);
 							//add click event to recalculate with new start point with other stops / waypoints the same.
