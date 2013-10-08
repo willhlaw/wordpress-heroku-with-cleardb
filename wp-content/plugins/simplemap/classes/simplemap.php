@@ -803,7 +803,7 @@ if ( !class_exists( 'Simple_Map' ) ) {
 						var label = "<label>Would you like to go here?</label>";
 						var input = "";
 						var addButton = "<input type='button' id='gd-goGetDirections' value='Add to Trip' />";
-						var removeButton = ""<input type='button' id='gd-removeAndGetDirections' value='Drop from Trip' />";";
+						var removeButton = "<input type='button' id='gd-removeAndGetDirections' value='Drop from Trip' />";
 						if (!document.getElementById('gd-startPoint') || !document.getElementById('gd-startPoint').innerHTML) {
 							//no address has been set, so prompt user inside infowindow for first time
 							label = "<label>Would you like to go here? (Enter your starting address):</label>";
