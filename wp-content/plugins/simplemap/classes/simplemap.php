@@ -877,7 +877,7 @@ if ( !class_exists( 'Simple_Map' ) ) {
 						if (!startPoint) {
 							var startPointDiv = document.createElement("div");
 							startPointDiv.id = thisObj.startPointDivID;
-							startPointDiv.innerHTML =  "<table style='margin-top: 2px;'><tr><td>" + "<label for='" + thisObj.startPointID + "'>Your trip's starting address:</label>" + "</td>" +
+							startPointDiv.innerHTML =  "<table style='margin-top: 2px; width: 0'><tr><td>" + "<label for='" + thisObj.startPointID + "'>Your trip's starting address:</label>" + "</td>" +
 							"<td>" + "<span contenteditable='true' id=" + thisObj.startPointID + " style='border: 1px solid #ddd; margin-top: 4px' />" + "</td>" +
 							"<td>" + "<input type='button' id='gd-reGetDirections' value='Recalculate Trip' />" + "</td></tr></table>" + 
 							"<br/>";
