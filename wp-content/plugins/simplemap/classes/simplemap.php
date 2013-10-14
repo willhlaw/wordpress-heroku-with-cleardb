@@ -862,6 +862,12 @@ if ( !class_exists( 'Simple_Map' ) ) {
 					}
 				}
 
+				if(typeof(thisObj.clearDirections)==='undefined') {//guarantees one time prototyping 
+					GmapDirections.prototype.clearDirections = function () {
+						thisObj.display.set('directions', null);
+					}
+				}
+
 				/**
 				 * Get the directions from google
 				 * @param string start (start address) //defaults to on page startPoint address
@@ -894,46 +900,53 @@ if ( !class_exists( 'Simple_Map' ) ) {
 
 						startPoint.innerHTML = startAddress; //sets it in case it is the first address from infowindow
 						//need to remove the last waypoint object because it is the same as our destination, and destination is required to be passed in
-						var savedEndPoint = thisObj.waypoints[thisObj.endWaypoint];
-						thisObj.removeStop(thisObj.endWaypoint); //temporarily remove last waypoint from waypoints array for Google
-						var request = {
-							origin: startAddress, 
-							destination: savedEndPoint.location,
-							waypoints: thisObj.getStops(),
-							optimizeWaypoints: thisObj.optimizeWaypoints || true,
-							provideRouteAlternatives: true,
-							travelMode: thisObj.travelMode || google.maps.DirectionsTravelMode.DRIVING
-						};
-						thisObj.service.route(request, function(response, status) {
-							if (status == google.maps.DirectionsStatus.OK) {
-								thisObj.display.setDirections(response);
-							} else {
-								alert('Error generating directions. Please try entering another address.');
-								startPoint.innerHTML = "Please try another address";
-							}
-						});
-						//add endpoint back to waypoints because we removed it above only temporarily
-						var endLat = savedEndPoint.location.split(",")[0];
-						var endLng = savedEndPoint.location.split(",")[1];
-						thisObj.addStop(endLat, endLng, null, true);
+						if (thisObj.endWaypoint == "") {
+							//there are no more waypoints so clear map and results of directions
+							thisObj.clearDirections();
+						}
+						else {
+							var savedEndPoint = thisObj.waypoints[thisObj.endWaypoint];
+							thisObj.removeStop(thisObj.endWaypoint); //temporarily remove last waypoint from waypoints array for Google
+							var request = {
+								origin: startAddress, 
+								destination: savedEndPoint.location,
+								waypoints: thisObj.getStops(),
+								optimizeWaypoints: thisObj.optimizeWaypoints || true,
+								provideRouteAlternatives: true,
+								travelMode: thisObj.travelMode || google.maps.DirectionsTravelMode.DRIVING
+							};
+							thisObj.service.route(request, function(response, status) {
+								if (status == google.maps.DirectionsStatus.OK) {
+									thisObj.display.setDirections(response);
+								} else {
+									alert('Error generating directions. Please try entering another address.');
+									startPoint.innerHTML = "Please try another address";
+								}
+							});
+							//add endpoint back to waypoints because we removed it above only temporarily
+							var endLat = savedEndPoint.location.split(",")[0];
+							var endLng = savedEndPoint.location.split(",")[1];
+							thisObj.addStop(endLat, endLng, savedEndPoint.title, null, true);
+						}
 
 					} // end computeDirections
 				}
 
 				if(typeof(thisObj.wrapInfowindow)==='undefined') {//guarantees one time prototyping 
-					GmapDirections.prototype.wrapInfowindow = function (windowContent) {
+					GmapDirections.prototype.wrapInfowindow = function (windowContent, windowTitle) {
 						//set up default values for case when user has already chosen a startPoint and at least one stop / waypoint
+						var title = "<div style='display: none' id='gd-windowTitle'>" + windowTitle + "</div>";
 						var label = "<label>Would you like to go here?</label>";
 						var input = "";
 						var addButton = "<input type='button' id='gd-goGetDirections' value='Add to Trip' />";
 						var removeButton = "<input type='button' id='gd-removeAndGetDirections' value='Drop from Trip' />";
 						if (!document.getElementById('gd-startPoint') || !document.getElementById('gd-startPoint').innerHTML) {
 							//no address has been set, so prompt user inside infowindow for first time
-							label = "<label>Would you like to go here? (Enter starting address):</label>";
+							label = "<label>Would you like to go here? (Enter starting address):</label>";							
 							input = "<input type='text' id='gd-startAddress' />";
 							removeButton = "";
 						}
-						var wrapper = "<div id='wrapper'>" + "<br/>" + label + input + addButton + removeButton + 
+						var wrapper = "<div id='wrapper'>" + "<br/>" + title + label + input + addButton + removeButton + 
 						"<hr>" +
 						windowContent +
 						"</div>";
@@ -948,8 +961,9 @@ if ( !class_exists( 'Simple_Map' ) ) {
 						google.maps.event.addDomListener(infoWindow, 'domready', function() {
 							jQuery('#gd-goGetDirections').click(function() {
 								//figure out if this is first time and start is from infowindow (gd-startAddress) or we are adding a stop / waypoint and start is from gd-startPoint which is default so pass in null for start
+								var title = (document.getElementById('gd-windowTitle') !== null) ? document.getElementById('gd-windowTitle').innerHTML : "";
 								var start = (document.getElementById('gd-startAddress') !== null) ? document.getElementById('gd-startAddress').value : null;
-								thisObj.addStop(lat, lng, null, true); //TODO: embed start address more into directions object instead of relying on gd-startPoint value
+								thisObj.addStop(lat, lng, title, null, true); //TODO: embed start address more into directions object instead of relying on gd-startPoint value
 								thisObj.computeDirections(start, lat, lng);
 								infoWindow.close();
 							});
@@ -973,23 +987,33 @@ if ( !class_exists( 'Simple_Map' ) ) {
 				thisObj.startWaypoint = "";
 				thisObj.endWaypoint = "";
 
-				//getStops returns a non-associative, indexable waypoints array
+				//getStops returns a non-associative, indexable waypoints array with just location and stopover to match the google directions waypoints array objects
 				if(typeof(thisObj.getStops)==='undefined') {//guarantees one time prototyping 
 					GmapDirections.prototype.getStops = function () {
 						var arrayStops = [];
+						var waypoint = {};
+						var gWaypoint = {};
 						for (var key in thisObj.waypoints) {
-							arrayStops.push(thisObj.waypoints[key]);
+							waypoint = thisObj.waypoints[key];
+							gWaypoint = {
+								location : waypoint.location,
+								stopover : waypoint.stopover
+							}
+							arrayStops.push(gWaypoint);
 						}
 						return arrayStops;
 					}
 				}
 
-				//setNewEndpoint iterates through associative array and assigns thisObj.endWaypoint to the last value
+				//setNewEndpoint with geoHashKey parameter or iterates through associative array and assigns thisObj.endWaypoint to the last value
 				if(typeof(thisObj.setNewEndpoint)==='undefined') {//guarantees one time prototyping 
-					GmapDirections.prototype.setNewEndpoint = function () {
-						thisObj.endWaypoint = "";
-						for (var key in thisObj.waypoints) {
-							thisObj.endWaypoint = key;
+					GmapDirections.prototype.setNewEndpoint = function (geoHashKey) {
+						thisObj.endWaypoint = geoHashKey || "";
+						if (thisObj.endWaypoint = "") {
+							//assign endWaypoint to the last waypoint in the array
+							for (var key in thisObj.waypoints) {
+								thisObj.endWaypoint = key;
+							}
 						}
 						return thisObj.endWaypoint;
 					}
@@ -1002,7 +1026,7 @@ if ( !class_exists( 'Simple_Map' ) ) {
 				}
 
 				if(typeof(thisObj.addStop)==='undefined') {//guarantees one time prototyping 
-					GmapDirections.prototype.addStop = function(lat, lng, isStart, isEnd, stopOverFlag) {
+					GmapDirections.prototype.addStop = function(lat, lng, title, isStart, isEnd, stopOverFlag) {
 						var latlngString = "" + lat + "," + lng;
 						var gHash = Fgh.encode(lat, lng, thisObj.geoHashBitLen); //aim with 3rd parameter, bitlen, is to geohash to close-by markers to a one or two character difference for unique comparison and find matches between marker directions and waypoints.
 						console.log(latlngString + " translates to geoHash: " + gHash);
@@ -1010,6 +1034,7 @@ if ( !class_exists( 'Simple_Map' ) ) {
 						thisObj.endWaypoint = (!isEnd) ? thisObj.endWaypoint : gHash;
 						var stopOver = stopOverFlag || true; //default is true, to add waypoint to route as a marker
 						thisObj.waypoints[gHash] = {
+						name: title,
 						location: latlngString,
 						stopover: stopOver
 						};
@@ -1704,7 +1729,7 @@ if ( !class_exists( 'Simple_Map' ) ) {
 					clearInfoWindows();
 					var infowindow = new google.maps.InfoWindow({
 						maxWidth: maxbubblewidth,
-						content: directions.wrapInfowindow(html) /*inserts logic from GmapDirections object so user can ask for directions with multiple routes */
+						content: directions.wrapInfowindow(html, locationData.name) /*inserts logic from GmapDirections object so user can ask for directions with multiple routes */
 					});
 					infowindow.open(map, marker);
 					infowindowsArray.push(infowindow);
