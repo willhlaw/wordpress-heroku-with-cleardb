@@ -876,7 +876,6 @@ if ( !class_exists( 'Simple_Map' ) ) {
 							startPointDiv.id = thisObj.startPointDivID || "gd-start";
 							startPointDiv.innerHTML =  "<table style='margin-top: 2px;'><tr><td>" + "<label for='gd-startPoint'>Your trip's starting address:</label>" + "</td>" +
 							"<td>" + "<span contenteditable='true' id='gd-startPoint' style='border: 1px solid #ddd; margin-top: 4px' />" + "</td>" +
-							"<td>" + "<span contenteditable='true' id='gd-testingGeoHashes' />" + "</td>" +
 							"<td>" + "<input type='button' id='gd-reGetDirections' value='Recalculate Trip' />" + "</td></tr></table>" + 
 							"<br/>";
 							insertAfter(document.getElementById( mapContainerId ), startPointDiv);
@@ -891,13 +890,12 @@ if ( !class_exists( 'Simple_Map' ) ) {
 						}
 
 						startPoint.innerHTML = startAddress; //sets it in case it is the first address from infowindow
-						//need to remove the last waypoint because it is the same as our destination, and destination is required
-						var stopPoints = thisObj.waypoints.slice(0); //essentially clones the array doing a shallow copy
-						stopPoints.length = stopPoints.length - 1;
-						var endPoint = (!endLng) ? thisObj.waypoints[thisObj.waypoints.length-1].location : ((endLng === "address") ? endLat : new google.maps.LatLng(endLat, endLng)); //use last waypoint if no end points were passed in. If endLng was "address", then second parameter endLng is address string (for case when link is clicked)
+						//need to remove the last waypoint object because it is the same as our destination, and destination is required to be passed in
+						var savedEndPoint = thisObj.waypoints[thisObj.endpoint];
+						thisObj.removeStop(thisObj.endpoint); //temporarily remove last waypoint from waypoints array for Google
 						var request = {
 							origin: startAddress, 
-							destination: endPoint,
+							destination: savedEndPoint.location,
 							waypoints: stopPoints,
 							optimizeWaypoints: thisObj.optimizeWaypoints || true,
 							provideRouteAlternatives: true,
@@ -911,6 +909,10 @@ if ( !class_exists( 'Simple_Map' ) ) {
 								startPoint.innerHTML = "Please try another address";
 							}
 						});
+						//add endpoint back to waypoints because we removed it above only temporarily
+						var endLat = savedEndPoint.location.split(",")[0];
+						var endLng = savedEndPoint.location.split(",")[1];
+						thisObj.addStop(endLat, endLng, null, true);
 
 					} // end computeDirections
 				}
@@ -942,9 +944,10 @@ if ( !class_exists( 'Simple_Map' ) ) {
 						var lng = clickedMarker.position.lng();
 						google.maps.event.addDomListener(infoWindow, 'domready', function() {
 							jQuery('#gd-goGetDirections').click(function() {
-								thisObj.addStop(lat, lng);
 								//figure out if this is first time and start is from infowindow (gd-startAddress) or we are adding a stop / waypoint and start is from gd-startPoint which is default so pass in null for start
 								var start = (document.getElementById('gd-startAddress') !== null) ? document.getElementById('gd-startAddress').value : null;
+								var isEnd = (start === null) ? true;
+								thisObj.addStop(lat, lng, start, isEnd); //if adding start, then send a non-falsy value, else send true of isEnd
 								thisObj.computeDirections(start, lat, lng);
 								infoWindow.close();
 							});
@@ -962,7 +965,10 @@ if ( !class_exists( 'Simple_Map' ) ) {
 
 				/************ Functions for managing waypoints or "Stops" along the route ***************/
 
-				thisObj.waypoints = new Array();
+				thisObj.waypoints = new Array(); //associative array with geohash as keys and values as waypoints objects for Google's Directions waypoints
+				thisObj.waypointsLength = 0; //keep track of length of associative array
+				thisObj.startpoint = "";
+				thisObj.endpoint = "";
 
 				if(typeof(thisObj.getStops)==='undefined') {//guarantees one time prototyping 
 					GmapDirections.prototype.getStops = function () {
@@ -977,15 +983,18 @@ if ( !class_exists( 'Simple_Map' ) ) {
 				}
 
 				if(typeof(thisObj.addStop)==='undefined') {//guarantees one time prototyping 
-					GmapDirections.prototype.addStop = function(lat, lng, stopOverFlag) {
+					GmapDirections.prototype.addStop = function(lat, lng, isStart, isEnd, stopOverFlag) {
 						var latlngString = "" + lat + "," + lng;
 						var gHash = Fgh.encode(lat, lng, thisObj.geoHashBitlen); //aim with 3rd parameter, bitlen, is to geohash to close-by markers to a one or two character difference for unique comparison and find matches between marker directions and waypoints.
 						console.log(latlngString + " translates to geoHash: " + gHash);
+						thisObj.startpoint = (!isStart) ? thisObj.startpoint : gHash;
+						thisObj.endpoint = (!isStart) ? thisObj.endpoint : gHash;
 						var stopOver = stopOverFlag || true; //default is true, to add waypoint to route as a marker
 						thisObj.waypoints[gHash] = {
 						location: latlngString,
 						stopover: stopOver
 						};
+						thisObj.waypointsLength += 1;
 					};
   				}
 
@@ -1002,7 +1011,11 @@ if ( !class_exists( 'Simple_Map' ) ) {
 							gHash = Fgh.encode(geoHashorLat, lng, thisObj.geoHashBitLen);
 						}
 						try {
+							//if item being removed is currently a startpoint or endpoint, then reset those. Caller or removed this may need to figure out that one of these has been reset and figure out what the new value should be 
+							thisObj.startpoint = (thisObj.startpoint == gHash) ? thisObj.startpoint = "" : thisObj.startpoint;
+							thisObj.endpoint = (thisObj.endpoint == gHash) ? thisObj.endpoint = "" : thisObj.endpoint; 
 							delete thisObj.waypoints(gHash);
+							thisObj.waypointsLength -= 1;
 						}
 						catch (e) {
 							console.log(gHash + " could not be deleted. Call was to .removeStop(" + goeHashorLat + ", " + lng + ") and error is: " + e);
@@ -1780,7 +1793,7 @@ if ( !class_exists( 'Simple_Map' ) ) {
 					if ( '' != dir_address2 ) { dir_address += '(' + escape( dir_address2 ) + ')' };
 
 					//html += '<a class="result_directions" href="http://google' + default_domain + '/maps?saddr=' + searchData.homeAddress + '&daddr=' + dir_address + '" target="_blank">' + get_directions_text + '</a>';
-					html += '<a class="result_directions" style="display: none" href="#map_top" onclick="directions.computeDirections(null, dir_address, \'address\'); return false;">' + 'Add to Trip' + '</a>'; //Custom injection for GmapDirections so instead of new page, user can add the site as a stop / waypoint on the map
+					html += '<a class="result_directions" style="display: none" href="#map_top" onclick="directions.computeDirections(null, dir_address, \'address\'); return false;">' + 'Add to Trip' + '</a>'; //TODO: Currently hidden on page. Custom injection for GmapDirections so instead of new page, user can add the site as a stop / waypoint on the map. TODO: Add as waypoint before calling computeDirections. Figure out if allow drop functionality. 
 				}
 				html += '</div>';
 				html += '<div style="clear: both;"></div>';
