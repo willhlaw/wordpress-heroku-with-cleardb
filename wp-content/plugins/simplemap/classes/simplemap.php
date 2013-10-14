@@ -815,6 +815,7 @@ if ( !class_exists( 'Simple_Map' ) ) {
 				thisObj.service = null; //Google DirectionsServive object
 				thisObj.resultsDiv = null; //where results from Google Directions API html will be put
 				thisObj.resultsDivId = null; 
+				thisObj.geoHashBitlen = 24; //used for Fgh encode function where bitlen purpose is to geohash to close-by markers to a one or two character difference for unique comparison and find matches between marker directions and waypoints.
 
 				//set options or defaults
 				thisObj.mapContainerId = mapContainerId || 'simplemap';
@@ -950,7 +951,7 @@ if ( !class_exists( 'Simple_Map' ) ) {
 						});
 						google.maps.event.addDomListener(infoWindow, 'domready', function() {
 							jQuery('#gd-removeAndGetDirections').click(function() {
-								thisObj.removeStop("" + lat + "," + lng);
+								thisObj.removeStop(lat, lng);
 								//remove a stop / waypoint so start will be from gd-startPoint which is default so pass in null for start and nothing for lat and lng because we want waypoint to be used
 								thisObj.computeDirections();
 								infoWindow.close();
@@ -961,12 +962,6 @@ if ( !class_exists( 'Simple_Map' ) ) {
 
 				/************ Functions for managing waypoints or "Stops" along the route ***************/
 
-				// Array Remove - By John Resig (MIT Licensed)
-                Array.prototype.remove = function(from, to) {
-                	var rest = this.slice((to || from) + 1 || this.length);
-                	this.length = from < 0 ? this.length + from : from;
-                	return this.push.apply(this, rest);
-                };
 				thisObj.waypoints = new Array();
 
 				if(typeof(thisObj.getStops)==='undefined') {//guarantees one time prototyping 
@@ -984,35 +979,35 @@ if ( !class_exists( 'Simple_Map' ) ) {
 				if(typeof(thisObj.addStop)==='undefined') {//guarantees one time prototyping 
 					GmapDirections.prototype.addStop = function(lat, lng, stopOverFlag) {
 						var latlngString = "" + lat + "," + lng;
-						var gHash = Fgh.encode(lat, lng, 32);
+						var gHash = Fgh.encode(lat, lng, thisObj.geoHashBitlen); //aim with 3rd parameter, bitlen, is to geohash to close-by markers to a one or two character difference for unique comparison and find matches between marker directions and waypoints.
 						console.log(latlngString + " translates to geoHash: " + gHash);
 						var stopOver = stopOverFlag || true; //default is true, to add waypoint to route as a marker
-						thisObj.waypoints.push({
+						thisObj.waypoints[gHash] = {
 						location: latlngString,
-						geoHash: gHash,
 						stopover: stopOver
 						});
 					};
   				}
 
   				if(typeof(thisObj.removeStop)==='undefined') { //guarantees one time prototyping 
-  					GmapDirections.prototype.removeStop = function(latlngStringOrIndex) {
-						var index = -1;
-
-						if (typeof latlngStringOrIndex !== "number") {
-							//parameter was a latlng string "32.34, -77.23"
-	  						for (var i = thisObj.waypoints.length - 1; i >= 0; i--) {
-								if (thisObj.waypoints[i].location === latlngStringOrIndex) {
-									index = i;
-									thisObj.waypoints.remove(index);
-									break;
-								}
-							}
-						} else {
+  					GmapDirections.prototype.removeStop = function(geoHashorLat, lng) {
+						var gHash = "";
+						if (!lng) {
+							//second parameter was missing so assume indexOrLat is an index
 							//parameter was an index "3" or "-1" for the last one
-							thisObj.waypoints.remove(index);
+							gHash = geoHashorLat;
 						}
-						return index;
+						else {
+							//parameters were a lat and lng
+							gHash = Fgh.encode(geoHashorLat, lng, thisObj.geoHashBitLen);
+						}
+						try {
+							delete thisObj.waypoints(gHash);
+						}
+						catch (e) {
+							console.log(gHash + " could not be deleted. Call was to .removeStop(" + goeHashorLat + ", " + lng + ") and error is: " + e);
+						}
+						return gHash;
 	  				};
   				}
 			} // end of GmapDirections 'class'
