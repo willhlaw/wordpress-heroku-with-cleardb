@@ -815,7 +815,7 @@ if ( !class_exists( 'Simple_Map' ) ) {
 				thisObj.service = null; //Google DirectionsServive object
 				thisObj.resultsDiv = null; //where results from Google Directions API html will be put
 				thisObj.resultsDivId = null; 
-				thisObj.geoHashBitlen = 24; //used for Fgh encode function where bitlen purpose is to geohash to close-by markers to a one or two character difference for unique comparison and find matches between marker directions and waypoints.
+				thisObj.geoHashBitLen = 24; //used for Fgh encode function where bitlen purpose is to geohash to close-by markers to a one or two character difference for unique comparison and find matches between marker directions and waypoints.
 
 				//set options or defaults
 				thisObj.mapContainerId = mapContainerId || 'simplemap';
@@ -992,7 +992,7 @@ if ( !class_exists( 'Simple_Map' ) ) {
 				if(typeof(thisObj.addStop)==='undefined') {//guarantees one time prototyping 
 					GmapDirections.prototype.addStop = function(lat, lng, isStart, isEnd, stopOverFlag) {
 						var latlngString = "" + lat + "," + lng;
-						var gHash = Fgh.encode(lat, lng, thisObj.geoHashBitlen); //aim with 3rd parameter, bitlen, is to geohash to close-by markers to a one or two character difference for unique comparison and find matches between marker directions and waypoints.
+						var gHash = Fgh.encode(lat, lng, thisObj.geoHashBitLen); //aim with 3rd parameter, bitlen, is to geohash to close-by markers to a one or two character difference for unique comparison and find matches between marker directions and waypoints.
 						console.log(latlngString + " translates to geoHash: " + gHash);
 						thisObj.startWaypoint = (!isStart) ? thisObj.startWaypoint : gHash;
 						thisObj.endWaypoint = (!isEnd) ? thisObj.endWaypoint : gHash;
