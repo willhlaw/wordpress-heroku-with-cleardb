@@ -899,7 +899,7 @@ if ( !class_exists( 'Simple_Map' ) ) {
 						var request = {
 							origin: startAddress, 
 							destination: savedEndPoint.location,
-							waypoints: thisObj.waypoints,
+							waypoints: thisObj.getStops(),
 							optimizeWaypoints: thisObj.optimizeWaypoints || true,
 							provideRouteAlternatives: true,
 							travelMode: thisObj.travelMode || google.maps.DirectionsTravelMode.DRIVING
@@ -972,9 +972,14 @@ if ( !class_exists( 'Simple_Map' ) ) {
 				thisObj.startWaypoint = "";
 				thisObj.endWaypoint = "";
 
+				//getStops returns a non-associative, indexable waypoints array
 				if(typeof(thisObj.getStops)==='undefined') {//guarantees one time prototyping 
 					GmapDirections.prototype.getStops = function () {
-						return thisObj.waypoints;
+						var arrayStops = [];
+						for (var key in thisObj.waypoints) {
+							arrayStops.push(thisObj.waypoints[key]);
+						}
+						return arrayStops;
 					}
 				}
 
