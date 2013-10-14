@@ -687,13 +687,126 @@ if ( !class_exists( 'Simple_Map' ) ) {
 			var markersArray = [];
 			var infowindowsArray = [];
 
+			/* (C) 2009 Ivan Boldyrev <lispnik@gmail.com>
+			 *
+			 * Fgh is a fast GeoHash implementation in JavaScript.
+			 *
+			 * Fgh is free software; you can redistribute it and/or modify
+			 * it under the terms of the GNU General Public License as published by
+			 * the Free Software Foundation; either version 3 of the License, or
+			 * (at your option) any later version.
+			 *
+			 * Fgh is distributed in the hope that it will be useful,
+			 * but WITHOUT ANY WARRANTY; without even the implied warranty of
+			 * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+			 * GNU General Public License for more details.
+			 *
+			 * You should have received a copy of the GNU General Public License
+			 * along with this software; if not, see <http://www.gnu.org/licenses/>.
+			 */
+
+			(function () {
+			    var _tr = "0123456789bcdefghjkmnpqrstuvwxyz";
+			    /* This is a table of i => "even bits of i combined".  For example:
+			     * #b10101 => #b111
+			     * #b01111 => #b011
+			     * #bABCDE => #bACE
+			     */
+			    var _dm = [0, 1, 0, 1, 2, 3, 2, 3, 0, 1, 0, 1, 2, 3, 2, 3, 
+			               4, 5, 4, 5, 6, 7, 6, 7, 4, 5, 4, 5, 6, 7, 6, 7];
+
+			    /* This is an opposit of _tr table: it maps #bABCDE to
+			     * #bA0B0C0D0E.
+			     */
+			    var _dr = [0, 1, 4, 5, 16, 17, 20, 21, 64, 65, 68, 69, 80,
+			               81, 84, 85, 256, 257, 260, 261, 272, 273, 276, 277,
+			               320, 321, 324, 325, 336, 337, 340, 341];
+
+			    function _cmb (str, pos) {
+			        return (_tr.indexOf(str.charAt(pos)) << 5) | (_tr.indexOf(str.charAt(pos+1)));
+			    };
+
+			    function _unp(v) {
+			        return _dm[v & 0x1F] | (_dm[(v >> 6) & 0xF] << 3);
+			    }
+
+			    function _sparse (val) {
+			        var acc = 0, off = 0;
+
+			        while (val > 0) {
+			            low = val & 0xFF;
+			            acc |= _dr[low] << off;
+			            val >>= 8;
+			            off += 16;
+			        }
+			        return acc;
+			    }
+
+			    window['Fgh'] = {
+			        decode: function (str) {
+			            var L = str.length, i, w, ln = 0.0, lt = 0.0;
+
+			            // Get word; handle odd size of string.
+			            if (L & 1) {
+			                w = (_tr.indexOf(str.charAt(L-1)) << 5);
+			            } else {
+			                w = _cmb(str, L-2);
+			            }
+			            lt = (_unp(w)) / 32.0;
+			            ln = (_unp(w >> 1)) / 32.0;
+			            
+			            for (i=(L-2) & ~0x1; i>=0; i-=2) {
+			                w = _cmb(str, i);
+			                lt = (_unp(w) + lt) / 32.0;
+			                ln = (_unp(w>>1) + ln) / 32.0;
+			            }
+			            return {lat:  180.0*(lt-0.5), lon: 360.0*(ln-0.5)};
+			        },
+			        
+			        encode: function (lat, lon, bits) {
+			            lat = lat/180.0+0.5;
+			            lon = lon/360.0+0.5;
+			            
+			            /* We generate two symbols per iteration; each symbol is 5
+			             * bits; so we divide by 2*5 == 10.
+			             */
+			            var r = '', l = Math.ceil(bits/10), hlt, hln, b2, hi, lo, i;
+
+			            for (i = 0; i < l; ++i) {
+			                lat *= 0x20;
+			                lon *= 0x20;
+
+			                hlt = Math.min(0x1F, Math.floor(lat));
+			                hln = Math.min(0x1F, Math.floor(lon));
+			                
+			                lat -= hlt;
+			                lon -= hln;
+			                
+			                b2 = _sparse(hlt) | (_sparse(hln) << 1);
+			                
+			                hi = b2 >> 5;
+			                lo = b2 & 0x1F;
+
+			                r += _tr.charAt(hi) + _tr.charAt(lo);
+			            }
+			            
+			            r = r.substr(0, Math.ceil(bits/5));
+			            return r;
+			        },
+			    
+			        checkValid: function(str) {
+			            return !!str.match(/^[0-9b-hjkmnp-z]+$/);
+			        }
+			    }
+			})();
 			//var directionsDisplay;
 			//var directionsService;
 			//var directionsResults;
 
 			/* Function: GmapDirections class
-			 * Author: Will Lawrence <will.lawrence [at] gmail>
+			 * Author: willhlaw <will.lawrence [at] gmail>
 			 * Dependencies: jQuery and Google.maps object needs to be instantiated.
+			 *               Also relies on Ivan Boldyrev's Fgh fast GeoHash implementation in JavaScript.
 			 */
 			function GmapDirections(mapContainerId, options) {
 				var thisObj = this; //so that this can be bound to something in an event handler
@@ -760,8 +873,9 @@ if ( !class_exists( 'Simple_Map' ) ) {
 						if (!startPoint) {
 							var startPointDiv = document.createElement("div");
 							startPointDiv.id = thisObj.startPointDivID || "gd-start";
-							startPointDiv.innerHTML =  "<table style='width: 0'><tr><td>" + "<label for='gd-startPoint'>Your trip's starting address:</label>" + "</td>" +
-							"<td>" + "<span contenteditable='true' id='gd-startPoint' style='padding: 3px; border: 1px solid #ddd; margin-top: 4px' />" + "</td>" +
+							startPointDiv.innerHTML =  "<table style='margin-top: 2px;'><tr><td>" + "<label for='gd-startPoint'>Your trip's starting address:</label>" + "</td>" +
+							"<td>" + "<span contenteditable='true' id='gd-startPoint' style='border: 1px solid #ddd; margin-top: 4px' />" + "</td>" +
+							"<td>" + "<span contenteditable='true' id='gd-testingGeoHashes' />" + "</td>" +
 							"<td>" + "<input type='button' id='gd-reGetDirections' value='Recalculate Trip' />" + "</td></tr></table>" + 
 							"<br/>";
 							insertAfter(document.getElementById( mapContainerId ), startPointDiv);
@@ -824,10 +938,10 @@ if ( !class_exists( 'Simple_Map' ) ) {
 				if(typeof(thisObj.setDirections)==='undefined') {//guarantees one time prototyping 
 					GmapDirections.prototype.setDirections = function (clickedMarker, infoWindow) {
 						var lat = clickedMarker.position.lat();
-						var lng = clickedMarker.position.lng()
+						var lng = clickedMarker.position.lng();
 						google.maps.event.addDomListener(infoWindow, 'domready', function() {
 							jQuery('#gd-goGetDirections').click(function() {
-								thisObj.addStop("" + lat + "," + lng);
+								thisObj.addStop(lat, lng);
 								//figure out if this is first time and start is from infowindow (gd-startAddress) or we are adding a stop / waypoint and start is from gd-startPoint which is default so pass in null for start
 								var start = (document.getElementById('gd-startAddress') !== null) ? document.getElementById('gd-startAddress').value : null;
 								thisObj.computeDirections(start, lat, lng);
@@ -868,10 +982,14 @@ if ( !class_exists( 'Simple_Map' ) ) {
 				}
 
 				if(typeof(thisObj.addStop)==='undefined') {//guarantees one time prototyping 
-					GmapDirections.prototype.addStop = function(latlngString, stopOverFlag) {
+					GmapDirections.prototype.addStop = function(lat, lng, stopOverFlag) {
+						var latlngString = "" + lat + "," + lng);
+						var gHash = Fgh.encode(lat, Lng, 32);
+						console.log(latlngString + " translates to geoHash: " + gHash);
 						var stopOver = stopOverFlag || true; //default is true, to add waypoint to route as a marker
 						thisObj.waypoints.push({
 						location: latlngString,
+						geoHash: gHash,
 						stopover: stopOver
 						});
 					};
