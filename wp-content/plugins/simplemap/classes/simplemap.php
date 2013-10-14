@@ -898,7 +898,7 @@ if ( !class_exists( 'Simple_Map' ) ) {
 						var request = {
 							origin: startAddress, 
 							destination: savedEndPoint.location,
-							waypoints: stopPoints,
+							waypoints: thisObj.waypoints,
 							optimizeWaypoints: thisObj.optimizeWaypoints || true,
 							provideRouteAlternatives: true,
 							travelMode: thisObj.travelMode || google.maps.DirectionsTravelMode.DRIVING
