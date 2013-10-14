@@ -989,7 +989,7 @@ if ( !class_exists( 'Simple_Map' ) ) {
 					GmapDirections.prototype.setNewEndpoint = function () {
 						thisObj.endWaypoint = "";
 						for (var key in thisObj.waypoints) {
-							thisObj.endWaypoint = thisObj.waypoints[key];
+							thisObj.endWaypoint = key;
 						}
 						return thisObj.endWaypoint;
 					}
