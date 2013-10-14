@@ -815,7 +815,7 @@ if ( !class_exists( 'Simple_Map' ) ) {
 				thisObj.service = null; //Google DirectionsServive object
 				thisObj.resultsDiv = null; //where results from Google Directions API html will be put
 				thisObj.resultsDivId = null; 
-				thisObj.geoHashBitLen = 24; //used for Fgh encode function where bitlen purpose is to geohash to close-by markers to a one or two character difference for unique comparison and find matches between marker directions and waypoints.
+				thisObj.geoHashBitLen = options.geoHashBitLen || 24; //used for Fgh encode function where bitlen purpose is to geohash to close-by markers to a one or two character difference for unique comparison and find matches between marker directions and waypoints.
 
 				//set options or defaults
 				thisObj.mapContainerId = mapContainerId || 'simplemap';
