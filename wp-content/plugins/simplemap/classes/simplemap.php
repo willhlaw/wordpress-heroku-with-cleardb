@@ -957,6 +957,7 @@ if ( !class_exists( 'Simple_Map' ) ) {
 						google.maps.event.addDomListener(infoWindow, 'domready', function() {
 							jQuery('#gd-removeAndGetDirections').click(function() {
 								thisObj.removeStop(lat, lng);
+								thisObj.setNewEndpoint();
 								//remove a stop / waypoint so start will be from gd-startPoint which is default so pass in null for start and nothing for lat and lng because we want waypoint to be used
 								thisObj.computeDirections();
 								infoWindow.close();
@@ -972,14 +973,24 @@ if ( !class_exists( 'Simple_Map' ) ) {
 				thisObj.startWaypoint = "";
 				thisObj.endWaypoint = "";
 
-				//getStops returns a non-associative, indexable waypoints array
-				if(typeof(thisObj.getStops)==='undefined') {//guarantees one time prototyping 
-					GmapDirections.prototype.getStops = function () {
+				//setNewEndpoint iterates through associative array and assigns thisObj.endWaypoint to the last value
+				if(typeof(thisObj.setNewEndpoint)==='undefined') {//guarantees one time prototyping 
+					GmapDirections.prototype.setNewEndpoint = function () {
+						thisObj.endWaypoint = "";
+						for (var key in thisObj.waypoints) {
+							thisObj.endWaypoint = thisObj.waypoints[key];
+						}
+						return thisObj.endWaypoint;
+					}
+				}
+
+
+				if(typeof(thisObj.setStops)==='undefined') {//guarantees one time prototyping 
+					GmapDirections.prototype.setStops = function (directionWaypoints) {
 						var arrayStops = [];
 						for (var key in thisObj.waypoints) {
 							arrayStops.push(thisObj.waypoints[key]);
 						}
-						return arrayStops;
 					}
 				}
 
