@@ -985,7 +985,7 @@ if ( !class_exists( 'Simple_Map' ) ) {
 						thisObj.waypoints[gHash] = {
 						location: latlngString,
 						stopover: stopOver
-						});
+						};
 					};
   				}
 
