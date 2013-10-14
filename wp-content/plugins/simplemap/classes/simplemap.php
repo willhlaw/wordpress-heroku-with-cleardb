@@ -828,7 +828,8 @@ if ( !class_exists( 'Simple_Map' ) ) {
 				thisObj.optimizeWaypoints = options.optimizeWaypoints; // use default option later because google may not be defined.
 				thisObj.resultsDivId = options.resultsDivId || thisObj.mapContainerId + "-results";
 
-				thisObj.startPointDivID = options.startPointDivID || "gd-startPoint";
+				thisObj.startPointDivID = options.startPointDivID || "gd-start";
+				thisObj.startPointID = options.startPointID || "gd-startPoint";
 
 				if(typeof(thisObj.setDisplay)==='undefined') {//guarantees one time prototyping 
 					GmapDirections.prototype.setDisplay = function (map) {
@@ -872,12 +873,12 @@ if ( !class_exists( 'Simple_Map' ) ) {
 
 						//if startPoint does not exist, then create it
 						var startAddress = null;
-						var startPoint = document.getElementById(thisObj.startPointDivID); //startPointDivID default is 'gd-startPoint'
+						var startPoint = document.getElementById(thisObj.startPointDivID); //startPointDivID default is 'gd-start'
 						if (!startPoint) {
 							var startPointDiv = document.createElement("div");
 							startPointDiv.id = thisObj.startPointDivID;
-							startPointDiv.innerHTML =  "<table style='margin-top: 2px;'><tr><td>" + "<label for='" + thisObj.startPointDivID + "'>Your trip's starting address:</label>" + "</td>" +
-							"<td>" + "<span contenteditable='true' id=" + thisObj.startPointDivID + " style='border: 1px solid #ddd; margin-top: 4px' />" + "</td>" +
+							startPointDiv.innerHTML =  "<table style='margin-top: 2px;'><tr><td>" + "<label for='" + thisObj.startPointID + "'>Your trip's starting address:</label>" + "</td>" +
+							"<td>" + "<span contenteditable='true' id=" + thisObj.startPointID + " style='border: 1px solid #ddd; margin-top: 4px' />" + "</td>" +
 							"<td>" + "<input type='button' id='gd-reGetDirections' value='Recalculate Trip' />" + "</td></tr></table>" + 
 							"<br/>";
 							insertAfter(document.getElementById( mapContainerId ), startPointDiv);
@@ -885,7 +886,7 @@ if ( !class_exists( 'Simple_Map' ) ) {
 							jQuery('#gd-reGetDirections').click(function() {
 								thisObj.computeDirections(); //computeDirections handles all the defaults (grabs gd-startPoint from page and uses last waypoint)
 							});
-							startPoint = document.getElementById('gd-startPoint');
+							startPoint = thisObj.startPointID;
 							startAddress = start;
 						} else {
 							startAddress = startPoint.innerHTML;
