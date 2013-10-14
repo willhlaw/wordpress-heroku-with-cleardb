@@ -983,7 +983,7 @@ if ( !class_exists( 'Simple_Map' ) ) {
 
 				if(typeof(thisObj.addStop)==='undefined') {//guarantees one time prototyping 
 					GmapDirections.prototype.addStop = function(lat, lng, stopOverFlag) {
-						var latlngString = "" + lat + "," + lng);
+						var latlngString = "" + lat + "," + lng;
 						var gHash = Fgh.encode(lat, Lng, 32);
 						console.log(latlngString + " translates to geoHash: " + gHash);
 						var stopOver = stopOverFlag || true; //default is true, to add waypoint to route as a marker
