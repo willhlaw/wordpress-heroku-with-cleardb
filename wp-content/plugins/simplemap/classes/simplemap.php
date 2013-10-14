@@ -948,8 +948,7 @@ if ( !class_exists( 'Simple_Map' ) ) {
 							jQuery('#gd-goGetDirections').click(function() {
 								//figure out if this is first time and start is from infowindow (gd-startAddress) or we are adding a stop / waypoint and start is from gd-startPoint which is default so pass in null for start
 								var start = (document.getElementById('gd-startAddress') !== null) ? document.getElementById('gd-startAddress').value : null;
-								var isEnd = (start === null) ? true : null;
-								thisObj.addStop(lat, lng, null, isEnd); //TODO: embed start address more into directions object instead of relying on gd-startPoint value. If adding start, then send a non-falsy value, else send true of isEnd
+								thisObj.addStop(lat, lng, null, true); //TODO: embed start address more into directions object instead of relying on gd-startPoint value
 								thisObj.computeDirections(start, lat, lng);
 								infoWindow.close();
 							});
