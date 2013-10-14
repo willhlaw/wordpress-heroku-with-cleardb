@@ -828,6 +828,8 @@ if ( !class_exists( 'Simple_Map' ) ) {
 				thisObj.optimizeWaypoints = options.optimizeWaypoints; // use default option later because google may not be defined.
 				thisObj.resultsDivId = options.resultsDivId || thisObj.mapContainerId + "-results";
 
+				thisObj.startPointDivID = options.startPointDivID || "gd-startPoint";
+
 				if(typeof(thisObj.setDisplay)==='undefined') {//guarantees one time prototyping 
 					GmapDirections.prototype.setDisplay = function (map) {
 						thisObj.display = new google.maps.DirectionsRenderer(thisObj.directionRendererOpts);
@@ -870,12 +872,12 @@ if ( !class_exists( 'Simple_Map' ) ) {
 
 						//if startPoint does not exist, then create it
 						var startAddress = null;
-						var startPoint = document.getElementById('gd-startPoint');
+						var startPoint = document.getElementById(thisObj.startPointDivID); //startPointDivID default is 'gd-startPoint'
 						if (!startPoint) {
 							var startPointDiv = document.createElement("div");
-							startPointDiv.id = thisObj.startPointDivID || "gd-start";
-							startPointDiv.innerHTML =  "<table style='margin-top: 2px;'><tr><td>" + "<label for='gd-startPoint'>Your trip's starting address:</label>" + "</td>" +
-							"<td>" + "<span contenteditable='true' id='gd-startPoint' style='border: 1px solid #ddd; margin-top: 4px' />" + "</td>" +
+							startPointDiv.id = thisObj.startPointDivID;
+							startPointDiv.innerHTML =  "<table style='margin-top: 2px;'><tr><td>" + "<label for='" + thisObj.startPointDivID + "'>Your trip's starting address:</label>" + "</td>" +
+							"<td>" + "<span contenteditable='true' id=" + thisObj.startPointDivID + " style='border: 1px solid #ddd; margin-top: 4px' />" + "</td>" +
 							"<td>" + "<input type='button' id='gd-reGetDirections' value='Recalculate Trip' />" + "</td></tr></table>" + 
 							"<br/>";
 							insertAfter(document.getElementById( mapContainerId ), startPointDiv);
@@ -891,8 +893,8 @@ if ( !class_exists( 'Simple_Map' ) ) {
 
 						startPoint.innerHTML = startAddress; //sets it in case it is the first address from infowindow
 						//need to remove the last waypoint object because it is the same as our destination, and destination is required to be passed in
-						var savedEndPoint = thisObj.waypoints[thisObj.endpoint];
-						thisObj.removeStop(thisObj.endpoint); //temporarily remove last waypoint from waypoints array for Google
+						var savedEndPoint = thisObj.waypoints[thisObj.endWaypoint];
+						thisObj.removeStop(thisObj.endWaypoint); //temporarily remove last waypoint from waypoints array for Google
 						var request = {
 							origin: startAddress, 
 							destination: savedEndPoint.location,
@@ -947,7 +949,7 @@ if ( !class_exists( 'Simple_Map' ) ) {
 								//figure out if this is first time and start is from infowindow (gd-startAddress) or we are adding a stop / waypoint and start is from gd-startPoint which is default so pass in null for start
 								var start = (document.getElementById('gd-startAddress') !== null) ? document.getElementById('gd-startAddress').value : null;
 								var isEnd = (start === null) ? true : null;
-								thisObj.addStop(lat, lng, start, isEnd); //if adding start, then send a non-falsy value, else send true of isEnd
+								thisObj.addStop(lat, lng, null, isEnd); //TODO: embed start address more into directions object instead of relying on gd-startPoint value. If adding start, then send a non-falsy value, else send true of isEnd
 								thisObj.computeDirections(start, lat, lng);
 								infoWindow.close();
 							});
@@ -967,8 +969,8 @@ if ( !class_exists( 'Simple_Map' ) ) {
 
 				thisObj.waypoints = new Array(); //associative array with geohash as keys and values as waypoints objects for Google's Directions waypoints
 				thisObj.waypointsLength = 0; //keep track of length of associative array
-				thisObj.startpoint = "";
-				thisObj.endpoint = "";
+				thisObj.startWaypoint = "";
+				thisObj.endWaypoint = "";
 
 				if(typeof(thisObj.getStops)==='undefined') {//guarantees one time prototyping 
 					GmapDirections.prototype.getStops = function () {
@@ -987,8 +989,8 @@ if ( !class_exists( 'Simple_Map' ) ) {
 						var latlngString = "" + lat + "," + lng;
 						var gHash = Fgh.encode(lat, lng, thisObj.geoHashBitlen); //aim with 3rd parameter, bitlen, is to geohash to close-by markers to a one or two character difference for unique comparison and find matches between marker directions and waypoints.
 						console.log(latlngString + " translates to geoHash: " + gHash);
-						thisObj.startpoint = (!isStart) ? thisObj.startpoint : gHash;
-						thisObj.endpoint = (!isStart) ? thisObj.endpoint : gHash;
+						thisObj.startWaypoint = (!isStart) ? thisObj.startWaypoint : gHash;
+						thisObj.endWaypoint = (!isEnd) ? thisObj.endWaypoint : gHash;
 						var stopOver = stopOverFlag || true; //default is true, to add waypoint to route as a marker
 						thisObj.waypoints[gHash] = {
 						location: latlngString,
@@ -1011,14 +1013,14 @@ if ( !class_exists( 'Simple_Map' ) ) {
 							gHash = Fgh.encode(geoHashorLat, lng, thisObj.geoHashBitLen);
 						}
 						try {
-							//if item being removed is currently a startpoint or endpoint, then reset those. Caller or removed this may need to figure out that one of these has been reset and figure out what the new value should be 
-							thisObj.startpoint = (thisObj.startpoint == gHash) ? thisObj.startpoint = "" : thisObj.startpoint;
-							thisObj.endpoint = (thisObj.endpoint == gHash) ? thisObj.endpoint = "" : thisObj.endpoint; 
-							delete thisObj.waypoints(gHash);
+							//if item being removed is currently a start waypoint or end waypoint, then reset those. Caller or removed this may need to figure out that one of these has been reset and figure out what the new value should be 
+							thisObj.startWaypoint = (thisObj.startWaypoint == gHash) ? thisObj.startWaypoint = "" : thisObj.startWaypoint;
+							thisObj.endWaypoint = (thisObj.endWaypoint == gHash) ? thisObj.endWaypoint = "" : thisObj.endWaypoint; 
+							delete thisObj.waypoints[gHash];
 							thisObj.waypointsLength -= 1;
 						}
 						catch (e) {
-							console.log(gHash + " could not be deleted. Call was to .removeStop(" + goeHashorLat + ", " + lng + ") and error is: " + e);
+							console.log(gHash + " could not be deleted. Call was to .removeStop(" + geoHashorLat + ", " + lng + ") and error is: " + e);
 						}
 						return gHash;
 	  				};
