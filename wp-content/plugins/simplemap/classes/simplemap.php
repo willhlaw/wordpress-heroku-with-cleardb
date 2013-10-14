@@ -873,7 +873,7 @@ if ( !class_exists( 'Simple_Map' ) ) {
 
 						//if startPoint does not exist, then create it
 						var startAddress = null;
-						var startPoint = document.getElementById(thisObj.startPointDivID); //startPointDivID default is 'gd-start'
+						var startPoint = document.getElementById(thisObj.startPointID); //startPointDivID default is 'gd-startPoint'
 						if (!startPoint) {
 							var startPointDiv = document.createElement("div");
 							startPointDiv.id = thisObj.startPointDivID;
@@ -886,7 +886,7 @@ if ( !class_exists( 'Simple_Map' ) ) {
 							jQuery('#gd-reGetDirections').click(function() {
 								thisObj.computeDirections(); //computeDirections handles all the defaults (grabs gd-startPoint from page and uses last waypoint)
 							});
-							startPoint = thisObj.startPointID;
+							startPoint = document.getElementById(thisObj.startPointID);
 							startAddress = start;
 						} else {
 							startAddress = startPoint.innerHTML;
