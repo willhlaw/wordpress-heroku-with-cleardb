@@ -731,12 +731,15 @@ if ( !class_exists( 'Simple_Map' ) ) {
 
 						thisObj.display.setPanel(thisObj.results);
 
+						//instead of below function to un-overlap the A and B icons with start and destination text, use css for adp-text class instead
+						/* 
 						google.maps.event.addListener(directions.display, 'directions_changed', function() {
 							//un-overlap the A and B icons and the start and destination text (which are class .adp-text.
 							setTimeout(function() {
-								jQuery(".adp-text").css('width', 0);
+								jQuery(".adp-text").css('width', 0); //this value may need to be tweaked per page or commented out to use css for adp-text class instead
 							}, 1000);
 						});
+						*/
 
 						thisObj.service = new google.maps.DirectionsService();
 					}
@@ -806,7 +809,7 @@ if ( !class_exists( 'Simple_Map' ) ) {
 						var removeButton = "<input type='button' id='gd-removeAndGetDirections' value='Drop from Trip' />";
 						if (!document.getElementById('gd-startPoint') || !document.getElementById('gd-startPoint').innerHTML) {
 							//no address has been set, so prompt user inside infowindow for first time
-							label = "<label>Would you like to go here? (Enter your starting address):</label>";
+							label = "<label>Would you like to go here? (Enter starting address):</label>";
 							input = "<input type='text' id='gd-startAddress' />";
 							removeButton = "";
 						}
@@ -834,7 +837,7 @@ if ( !class_exists( 'Simple_Map' ) ) {
 						google.maps.event.addDomListener(infoWindow, 'domready', function() {
 							jQuery('#gd-removeAndGetDirections').click(function() {
 								thisObj.removeStop("" + lat + "," + lng);
-								//remove a stop / waypoint so start will from gd-startPoint which is default so pass in null for start and nothing for lat and lng because we want waypoint to be used
+								//remove a stop / waypoint so start will be from gd-startPoint which is default so pass in null for start and nothing for lat and lng because we want waypoint to be used
 								thisObj.computeDirections();
 								infoWindow.close();
 							});
