@@ -973,6 +973,17 @@ if ( !class_exists( 'Simple_Map' ) ) {
 				thisObj.startWaypoint = "";
 				thisObj.endWaypoint = "";
 
+				//getStops returns a non-associative, indexable waypoints array
+				if(typeof(thisObj.getStops)==='undefined') {//guarantees one time prototyping 
+					GmapDirections.prototype.getStops = function () {
+						var arrayStops = [];
+						for (var key in thisObj.waypoints) {
+							arrayStops.push(thisObj.waypoints[key]);
+						}
+						return arrayStops;
+					}
+				}
+
 				//setNewEndpoint iterates through associative array and assigns thisObj.endWaypoint to the last value
 				if(typeof(thisObj.setNewEndpoint)==='undefined') {//guarantees one time prototyping 
 					GmapDirections.prototype.setNewEndpoint = function () {
@@ -981,16 +992,6 @@ if ( !class_exists( 'Simple_Map' ) ) {
 							thisObj.endWaypoint = thisObj.waypoints[key];
 						}
 						return thisObj.endWaypoint;
-					}
-				}
-
-
-				if(typeof(thisObj.setStops)==='undefined') {//guarantees one time prototyping 
-					GmapDirections.prototype.setStops = function (directionWaypoints) {
-						var arrayStops = [];
-						for (var key in thisObj.waypoints) {
-							arrayStops.push(thisObj.waypoints[key]);
-						}
 					}
 				}
 
