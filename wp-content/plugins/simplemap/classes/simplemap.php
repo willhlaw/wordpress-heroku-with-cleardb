@@ -1009,7 +1009,7 @@ if ( !class_exists( 'Simple_Map' ) ) {
 				if(typeof(thisObj.setNewEndpoint)==='undefined') {//guarantees one time prototyping 
 					GmapDirections.prototype.setNewEndpoint = function (geoHashKey) {
 						thisObj.endWaypoint = geoHashKey || "";
-						if (thisObj.endWaypoint = "") {
+						if (thisObj.endWaypoint === "") {
 							//assign endWaypoint to the last waypoint in the array
 							for (var key in thisObj.waypoints) {
 								thisObj.endWaypoint = key;
