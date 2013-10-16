@@ -821,7 +821,7 @@ if ( !class_exists( 'Simple_Map' ) ) {
 				//set options or defaults
 				thisObj.mapContainerId = mapContainerId || 'simplemap';
 				thisObj.directionRendererOpts = options.directionRendererOpts || ({
-					suppressMarkers: true, 
+					suppressMarkers: false, 
 					preserveViewport: false, 
 					draggable: true
 				});
