@@ -875,21 +875,17 @@ if ( !class_exists( 'Simple_Map' ) ) {
 				*/
 				if(typeof(thisObj.computeDirections)==='undefined') {//guarantees one time prototyping 
 					GmapDirections.prototype.showSteps = function (directionResult) {
-						var myRoute = directionResult.routes[0].legs;
+						var theRoute = directionResult.routes[0].legs;
 						var stepDisplay = new google.maps.InfoWindow();
 
-						for (var i = 0; i < myRoute.length; i++) {
+						for (var i = 0; i < theRoute.length; i++) {
 							var marker = new google.maps.Marker({
-								position: myRoute[i].end_location,
+								position: theRoute[i].end_location,
 								map: map
 							});
-							google.maps.event.addListener(marker, 'mouseover', function() {
-								marker.setVisible(false);
-								console.log("hiding markerWaypoint: " + Fgh.encode(marker.position.lat(), marker.position.lng, thisObj.geoHashBitLen));
-							});
-							google.maps.event.addListener(marker, 'mouseout', function() {
-								marker.setVisible(true);
-								console.log("unhiding markerWaypoint: " + Fgh.encode(marker.position.lat(), marker.position.lng, thisObj.geoHashBitLen));
+							google.maps.event.addListener(marker, 'click', function() {
+								//find same placemark and open it's infowindow
+								console.log("markerWaypoint: " + Fgh.encode(marker.position.lat(), marker.position.lng, thisObj.geoHashBitLen));
 							});
 
 							//keep track of markers
