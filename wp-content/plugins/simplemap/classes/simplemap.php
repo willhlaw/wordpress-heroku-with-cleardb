@@ -942,7 +942,7 @@ if ( !class_exists( 'Simple_Map' ) ) {
 						var removeButton = "<input type='button' id='gd-removeAndGetDirections' value='Drop from Trip' />";
 						if (!document.getElementById('gd-startPoint') || !document.getElementById('gd-startPoint').innerHTML) {
 							//no address has been set, so prompt user inside infowindow for first time
-							label = "<label>Would you like to go here? (Enter starting address):</label>";							
+							label = "<label>Would you like to go here? (Enter your starting address):</label>";							
 							input = "<input type='text' id='gd-startAddress' />";
 							removeButton = "";
 						}
@@ -1569,6 +1569,9 @@ if ( !class_exists( 'Simple_Map' ) ) {
 				markersArray.push(marker);
 
 				var mapwidth = Number(stringFilter(map_width));
+				if (map_width.indexOf("%") >= 0) {
+					mapwidth = jQuery("#simplemap").width();
+				}
 				var mapheight = Number(stringFilter(map_height));
 
 				var maxbubblewidth = Math.round(mapwidth / 1.5);
