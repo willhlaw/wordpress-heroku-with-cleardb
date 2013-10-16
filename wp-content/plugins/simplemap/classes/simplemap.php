@@ -815,12 +815,13 @@ if ( !class_exists( 'Simple_Map' ) ) {
 				thisObj.service = null; //Google DirectionsServive object
 				thisObj.resultsDiv = null; //where results from Google Directions API html will be put
 				thisObj.resultsDivId = null; 
+				thisObj.markerWaypoints = []; //marker array for direction results
 				thisObj.geoHashBitLen = options.geoHashBitLen || 24; //used for Fgh encode function where bitlen purpose is to geohash to close-by markers to a one or two character difference for unique comparison and find matches between marker directions and waypoints.
 
 				//set options or defaults
 				thisObj.mapContainerId = mapContainerId || 'simplemap';
 				thisObj.directionRendererOpts = options.directionRendererOpts || ({
-					suppressMarkers: false, 
+					suppressMarkers: true, 
 					preserveViewport: false, 
 					draggable: true
 				});
@@ -865,6 +866,31 @@ if ( !class_exists( 'Simple_Map' ) ) {
 				if(typeof(thisObj.clearDirections)==='undefined') {//guarantees one time prototyping 
 					GmapDirections.prototype.clearDirections = function () {
 						thisObj.display.set('directions', null);
+					}
+				}
+
+				/**
+				* For each step, place a marker, and add the text to the marker's
+				* info window. Also attach the marker to an array so we can keep track of it
+				*/
+				if(typeof(thisObj.computeDirections)==='undefined') {//guarantees one time prototyping 
+					GmapDirections.prototype.showSteps = function (directionResult) {
+						var myRoute = directionResult.routes[0].legs[0];
+						var stepDisplay = new google.maps.InfoWindow();
+
+						for (var i = 0; i < myRoute.steps.length; i++) {
+							var marker = new google.maps.Marker({
+								position: myRoute.steps[i].start_point,
+								map: map
+							});
+							google.maps.event.addListener(marker, 'click', function() {
+								stepDisplay.setContent("Howdy");
+								stepDisplay.open(map, marker);
+							});
+
+							//keep track of markers
+							thisObj.markerWaypoints[i] = marker;
+						}
 					}
 				}
 
@@ -918,6 +944,7 @@ if ( !class_exists( 'Simple_Map' ) ) {
 							thisObj.service.route(request, function(response, status) {
 								if (status == google.maps.DirectionsStatus.OK) {
 									thisObj.display.setDirections(response);
+									thisObj.showSteps(response);
 								} else {
 									alert('Error generating directions. Please try entering another address.');
 									startPoint.innerHTML = "Please try another address";
