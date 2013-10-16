@@ -885,7 +885,7 @@ if ( !class_exists( 'Simple_Map' ) ) {
 							});
 							google.maps.event.addListener(marker, 'click', function() {
 								//find same placemark and open it's infowindow
-								console.log("markerWaypoint: " + Fgh.encode(marker.position.lat(), marker.position.lng, thisObj.geoHashBitLen));
+								console.log("markerWaypoint: " + Fgh.encode(marker.position.lat(), marker.position.lng(), thisObj.geoHashBitLen));
 							});
 
 							//keep track of markers
@@ -990,9 +990,14 @@ if ( !class_exists( 'Simple_Map' ) ) {
 								//figure out if this is first time and start is from infowindow (gd-startAddress) or we are adding a stop / waypoint and start is from gd-startPoint which is default so pass in null for start
 								var title = (document.getElementById('gd-windowTitle') !== null) ? document.getElementById('gd-windowTitle').innerHTML : "";
 								var start = (document.getElementById('gd-startAddress') !== null) ? document.getElementById('gd-startAddress').value : null;
-								thisObj.addStop(lat, lng, title, null, true); //TODO: embed start address more into directions object instead of relying on gd-startPoint value
-								thisObj.computeDirections(start, lat, lng);
-								infoWindow.close();
+								if (!document.getElementById('gd-startAddress').value) {
+									alert('Please enter an address before adding to your trip');
+								} 
+								else {
+									thisObj.addStop(lat, lng, title, null, true); //TODO: embed start address more into directions object instead of relying on gd-startPoint value
+									thisObj.computeDirections(start, lat, lng);
+									infoWindow.close();
+								}
 							});
 						});
 						google.maps.event.addDomListener(infoWindow, 'domready', function() {
