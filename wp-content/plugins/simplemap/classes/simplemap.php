@@ -870,22 +870,21 @@ if ( !class_exists( 'Simple_Map' ) ) {
 				}
 
 				/**
-				* For each step, place a marker, and add the text to the marker's
-				* info window. Also attach the marker to an array so we can keep track of it
+				* For end of each leg, place a marker, and attach the marker to an array so we can keep track of it
+				* @param object directionResult //response from google directions
 				*/
 				if(typeof(thisObj.computeDirections)==='undefined') {//guarantees one time prototyping 
 					GmapDirections.prototype.showSteps = function (directionResult) {
-						var myRoute = directionResult.routes[0].legs[0];
+						var myRoute = directionResult.routes[0].legs;
 						var stepDisplay = new google.maps.InfoWindow();
 
-						for (var i = 0; i < myRoute.steps.length; i++) {
+						for (var i = 0; i < myRoute.length; i++) {
 							var marker = new google.maps.Marker({
-								position: myRoute.steps[i].start_point,
+								position: myRoute[i].end_location,
 								map: map
 							});
-							google.maps.event.addListener(marker, 'click', function() {
-								stepDisplay.setContent("Howdy");
-								stepDisplay.open(map, marker);
+							google.maps.event.addListener(marker, 'mouseover', function() {
+								console.log("markerWaypoint: " + Fgh.encode(marker.position.lat(), marker.position.lng, thisObj.geoHashBitLen));
 							});
 
 							//keep track of markers
