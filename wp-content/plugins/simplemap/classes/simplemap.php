@@ -883,11 +883,11 @@ if ( !class_exists( 'Simple_Map' ) ) {
 								position: myRoute[i].end_location,
 								map: map
 							});
-							google.maps.event.addListener(marker, 'mousedown', function() {
+							google.maps.event.addListener(marker, 'mouseover', function() {
 								marker.setVisible(false);
 								console.log("hiding markerWaypoint: " + Fgh.encode(marker.position.lat(), marker.position.lng, thisObj.geoHashBitLen));
 							});
-							google.maps.event.addListener(marker, 'mouseup', function() {
+							google.maps.event.addListener(marker, 'mouseout', function() {
 								marker.setVisible(true);
 								console.log("unhiding markerWaypoint: " + Fgh.encode(marker.position.lat(), marker.position.lng, thisObj.geoHashBitLen));
 							});
@@ -1759,7 +1759,7 @@ if ( !class_exists( 'Simple_Map' ) ) {
 
 				html += '	</div>';
 
-				google.maps.event.addListener(marker, 'mouseup', function(e) {
+				google.maps.event.addListener(marker, 'click', function(e) {
 					clearInfoWindows();
 					var infowindow = new google.maps.InfoWindow({
 						maxWidth: maxbubblewidth,
