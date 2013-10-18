@@ -944,7 +944,7 @@ if ( !class_exists( 'Simple_Map' ) ) {
 							thisObj.service.route(request, function(response, status) {
 								if (status == google.maps.DirectionsStatus.OK) {
 									thisObj.display.setDirections(response);
-									thisObj.showSteps(response);
+									//thisObj.showSteps(response);
 								} else {
 									alert('Error generating directions. Please try entering another address.');
 									startPoint.innerHTML = "Please try another address";
