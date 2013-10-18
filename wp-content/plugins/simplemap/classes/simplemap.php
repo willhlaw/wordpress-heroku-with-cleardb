@@ -985,6 +985,11 @@ if ( !class_exists( 'Simple_Map' ) ) {
 					GmapDirections.prototype.setDirections = function (clickedMarker, infoWindow) {
 						var lat = clickedMarker.position.lat();
 						var lng = clickedMarker.position.lng();
+						var geoHash = Fgh.encode(lat, lng, thisObj.geoHashBitLen);
+						if (thisObj.waypoints[geoHash] === undefined) {
+							//this placemark has not been added as as waypoint, so do not show Drop from Trip button
+							jQuery("#gd-removeAndGetDirections").hide();
+						}
 						google.maps.event.addDomListener(infoWindow, 'domready', function() {
 							jQuery('#gd-goGetDirections').click(function() {
 								//figure out if this is first time and start is from infowindow (gd-startAddress) or we are adding a stop / waypoint and start is from gd-startPoint which is default so pass in null for start
