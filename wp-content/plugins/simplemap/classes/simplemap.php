@@ -997,7 +997,7 @@ if ( !class_exists( 'Simple_Map' ) ) {
 								//figure out if this is first time and start is from infowindow (gd-startAddress) or we are adding a stop / waypoint and start is from gd-startPoint which is default so pass in null for start
 								var title = (document.getElementById('gd-windowTitle') !== null) ? document.getElementById('gd-windowTitle').innerHTML : "";
 								var start = (document.getElementById('gd-startAddress') !== null) ? document.getElementById('gd-startAddress').value : null;
-								if (!document.getElementById('gd-startAddress').value) {
+								if (start !== null && !document.getElementById('gd-startAddress').value) {
 									alert('Please enter an address before adding to your trip');
 								} 
 								else {
