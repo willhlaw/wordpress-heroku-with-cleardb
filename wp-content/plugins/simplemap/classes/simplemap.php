@@ -960,7 +960,7 @@ if ( !class_exists( 'Simple_Map' ) ) {
 				}
 
 				if(typeof(thisObj.wrapInfowindow)==='undefined') {//guarantees one time prototyping 
-					GmapDirections.prototype.wrapInfowindow = function (windowContent, windowTitle) {
+					GmapDirections.prototype.wrapInfowindow = function (windowContent, windowTitle, marker) {
 						//set up default values for case when user has already chosen a startPoint and at least one stop / waypoint
 						var title = "<div style='display: none' id='gd-windowTitle'>" + windowTitle + "</div>";
 						var label = "<label>Would you like to go here?</label>";
@@ -971,6 +971,13 @@ if ( !class_exists( 'Simple_Map' ) ) {
 							//no address has been set, so prompt user inside infowindow for first time
 							label = "<label>Would you like to go here? (Enter your starting address):</label>";							
 							input = "<input type='text' id='gd-startAddress' />";
+							removeButton = "";
+						}
+						var lat = marker.position.lat();
+						var lng = marker.position.lng();
+						var geoHash = Fgh.encode(lat, lng, thisObj.geoHashBitLen);
+						if (thisObj.waypoints[geoHash] === undefined) {
+							//this placemark has not been added as as waypoint, so do not show Drop from Trip button
 							removeButton = "";
 						}
 						var wrapper = "<div id='wrapper'>" + "<br/>" + title + label + input + addButton + removeButton + 
@@ -985,11 +992,6 @@ if ( !class_exists( 'Simple_Map' ) ) {
 					GmapDirections.prototype.setDirections = function (clickedMarker, infoWindow) {
 						var lat = clickedMarker.position.lat();
 						var lng = clickedMarker.position.lng();
-						var geoHash = Fgh.encode(lat, lng, thisObj.geoHashBitLen);
-						if (thisObj.waypoints[geoHash] === undefined) {
-							//this placemark has not been added as as waypoint, so do not show Drop from Trip button
-							jQuery("#gd-removeAndGetDirections").hide();
-						}
 						google.maps.event.addDomListener(infoWindow, 'domready', function() {
 							jQuery('#gd-goGetDirections').click(function() {
 								//figure out if this is first time and start is from infowindow (gd-startAddress) or we are adding a stop / waypoint and start is from gd-startPoint which is default so pass in null for start
@@ -1769,7 +1771,7 @@ if ( !class_exists( 'Simple_Map' ) ) {
 					clearInfoWindows();
 					var infowindow = new google.maps.InfoWindow({
 						maxWidth: maxbubblewidth,
-						content: directions.wrapInfowindow(html, locationData.name) /*inserts logic from GmapDirections object so user can ask for directions with multiple routes */
+						content: directions.wrapInfowindow(html, locationData.name, marker) /*inserts logic from GmapDirections object so user can ask for directions with multiple routes */
 					});
 					infowindow.open(map, marker);
 					infowindowsArray.push(infowindow);
