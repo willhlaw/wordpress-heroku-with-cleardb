@@ -911,12 +911,18 @@ if ( !class_exists( 'Simple_Map' ) ) {
 							startPointDiv.id = thisObj.startPointDivID;
 							startPointDiv.innerHTML =  "<table style='margin-top: 2px; width: 0'><tr><td>" + "<label for='" + thisObj.startPointID + "'>Your trip's starting address:</label>" + "</td>" +
 							"<td>" + "<span contenteditable='true' id=" + thisObj.startPointID + " style='border: 1px solid #ddd; margin-top: 4px' />" + "</td>" +
-							"<td>" + "<input type='button' id='gd-reGetDirections' value='Recalculate Trip' />" + "</td></tr></table>" + 
+							"<td>" + "<input type='button' id='gd-reGetDirections' value='Recalculate Trip' />" + "</td>" +
+							"<td>" + "<input type='button' id='gd-clearDirections' value='Clear Trip' />" + "</td>" +
+							"</tr></table>" + 
 							"<br/>";
 							insertAfter(document.getElementById( mapContainerId ), startPointDiv);
 							//add click event to recalculate with new start point with other stops / waypoints the same.
 							jQuery('#gd-reGetDirections').click(function() {
 								thisObj.computeDirections(); //computeDirections handles all the defaults (grabs gd-startPoint from page and uses last waypoint)
+							});
+							//add click event to clear trip
+							jQuery('#gd-clearDirections').click(function() {
+								thisObj.clearDirections(); 
 							});
 							startPoint = document.getElementById(thisObj.startPointID);
 							startAddress = start;
