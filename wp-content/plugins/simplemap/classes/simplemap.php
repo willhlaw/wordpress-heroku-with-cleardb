@@ -873,7 +873,7 @@ if ( !class_exists( 'Simple_Map' ) ) {
 				* For end of each leg, place a marker, and attach the marker to an array so we can keep track of it
 				* @param object directionResult //response from google directions
 				*/
-				if(typeof(thisObj.computeDirections)==='undefined') {//guarantees one time prototyping 
+				if(typeof(thisObj.showSteps)==='undefined') {//guarantees one time prototyping 
 					GmapDirections.prototype.showSteps = function (directionResult) {
 						var theRoute = directionResult.routes[0].legs;
 						var stepDisplay = new google.maps.InfoWindow();
@@ -881,10 +881,11 @@ if ( !class_exists( 'Simple_Map' ) ) {
 						var marker = new google.maps.Marker({
 							position: theRoute[0].start_location,
 							map: map
-						})	
+						});	
 						google.maps.event.addListener(marker, 'click', function() {
-								stepDisplay.setContent(theRoute[0].start_address); //Show the starting address
-								stepDisplay.open(map, marker);
+							stepDisplay.setContent(theRoute[0].start_address); //Show the starting address
+							stepDisplay.open(map, marker);
+						});
 						console.log("number of adp direction icons: " + jQuery('.adp-marker').length);
 						for (var i = 0; i < theRoute.length; i++) {
 							marker = new google.maps.Marker({
