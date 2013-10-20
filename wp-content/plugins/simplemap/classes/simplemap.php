@@ -877,18 +877,28 @@ if ( !class_exists( 'Simple_Map' ) ) {
 					GmapDirections.prototype.showSteps = function (directionResult) {
 						var theRoute = directionResult.routes[0].legs;
 						var stepDisplay = new google.maps.InfoWindow();
+						//set up the first icon of the strip and show the starting address when it is clicked
 						var marker = new google.maps.Marker({
 							position: theRoute[0].start_location,
 							map: map
-						})
+						})	
+						google.maps.event.addListener(marker, 'click', function() {
+								stepDisplay.setContent(theRoute[0].start_address); //Show the starting address
+								stepDisplay.open(map, marker);
+						console.log("number of adp direction icons: " + jQuery('.adp-marker').length);
 						for (var i = 0; i < theRoute.length; i++) {
 							marker = new google.maps.Marker({
 								position: theRoute[i].end_location,
-								map: map
+								map: map,
+								clickable: false
 							});
 							google.maps.event.addListener(marker, 'click', function() {
-								//find same placemark and open it's infowindow
-								console.log("markerWaypoint: " + Fgh.encode(marker.position.lat(), marker.position.lng(), thisObj.geoHashBitLen));
+								//TODO: find same placemark and open it's infowindow
+								var geoHash = Fgh.encode(marker.position.lat(), marker.position.lng(), thisObj.geoHashBitLen);
+								var text = "test"; //gets text from placemark markers
+								console.log("markerWaypoint: " + geoHash);
+								stepDisplay.setContent(text);
+								stepDisplay.open(map, marker);
 							});
 
 							//keep track of markers
@@ -1129,8 +1139,11 @@ if ( !class_exists( 'Simple_Map' ) ) {
 
 			function clearOverlays() {
 				if (markersArray) {
-					for (var i=0;i<markersArray.length;i++) {
+					for (var key in markersArray) {
+						markersArray[key].setMap(null);
+					/*for (var i=0;i<markersArray.length;i++) {
 						markersArray[i].setMap(null);
+					*/
 					}
 				}
 			}
@@ -1563,8 +1576,8 @@ if ( !class_exists( 'Simple_Map' ) ) {
 						}
 
 						var searchMarker = new google.maps.Marker( searchMarkerOptions );
-						searchMarker.title = searchMarkerTitle;
-						markersArray.push(searchMarker);
+						searchMarker.title = searchMarkerTitle;)
+						markersArray.push(searchMarker); //add geoHash for gMapDirections
 						bounds.extend(searchMarkerOptions.position);
 					}
 
@@ -1614,7 +1627,7 @@ if ( !class_exists( 'Simple_Map' ) ) {
 				markerOptions.position = locationData.point;
 				var marker = new google.maps.Marker( markerOptions );
 				marker.title = locationData.name;
-				markersArray.push(marker);
+				markersArray.push(marker); //add geoHash for gMapDirections
 
 				var mapwidth = Number(stringFilter(map_width));
 				if (map_width.indexOf("%") >= 0) {
