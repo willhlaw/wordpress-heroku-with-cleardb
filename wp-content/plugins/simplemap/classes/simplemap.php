@@ -821,7 +821,7 @@ if ( !class_exists( 'Simple_Map' ) ) {
 				//set options or defaults
 				thisObj.mapContainerId = mapContainerId || 'simplemap';
 				thisObj.directionRendererOpts = options.directionRendererOpts || ({
-					suppressMarkers: false, 
+					suppressMarkers: true, 
 					preserveViewport: false, 
 					draggable: true
 				});
@@ -877,9 +877,12 @@ if ( !class_exists( 'Simple_Map' ) ) {
 					GmapDirections.prototype.showSteps = function (directionResult) {
 						var theRoute = directionResult.routes[0].legs;
 						var stepDisplay = new google.maps.InfoWindow();
-
+						var marker = new google.maps.Marker({
+							position: theRoute[0].start_location,
+							map: map
+						})
 						for (var i = 0; i < theRoute.length; i++) {
-							var marker = new google.maps.Marker({
+							marker = new google.maps.Marker({
 								position: theRoute[i].end_location,
 								map: map
 							});
@@ -950,7 +953,7 @@ if ( !class_exists( 'Simple_Map' ) ) {
 							thisObj.service.route(request, function(response, status) {
 								if (status == google.maps.DirectionsStatus.OK) {
 									thisObj.display.setDirections(response);
-									//thisObj.showSteps(response);
+									thisObj.showSteps(response);
 								} else {
 									alert('Error generating directions. Please try entering another address.');
 									startPoint.innerHTML = "Please try another address";
