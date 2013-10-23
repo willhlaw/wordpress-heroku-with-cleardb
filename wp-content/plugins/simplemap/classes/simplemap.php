@@ -1024,6 +1024,10 @@ if ( !class_exists( 'Simple_Map' ) ) {
 							//this placemark has not been added as as waypoint, so do not show Drop from Trip button
 							removeButton = "";
 						}
+						else {
+							//this placemark has already been added as as waypoint, so do not show Add to Trip button
+							addButton = "";
+						}
 						var wrapper = "<div id='wrapper'>" + "<br/>" + title + label + input + addButton + removeButton + 
 						"<hr>" +
 						windowContent +
