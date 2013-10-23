@@ -808,9 +808,9 @@ if ( !class_exists( 'Simple_Map' ) ) {
 			 * Dependencies: jQuery and Google.maps object needs to be instantiated.
 			 *               Also relies on Ivan Boldyrev's Fgh fast GeoHash implementation in JavaScript.
 			 */
-			function GmapDirections(mapContainerId, options) {
+			function GmapDirections(mapContainerId, opts) {
 				var thisObj = this; //so that this can be bound to something in an event handler
-				var options = options || {}; //prevents undefined errors if no options parameter is passed in. (e.g. options.option1 will no longer complain about opdtions object being undefined)
+				var options = opts || {}; //prevents undefined errors if no options parameter is passed in. (e.g. options.option1 will no longer complain about opdtions object being undefined)
 				thisObj.display = null; //Google DirectionsRenderer object
 				thisObj.service = null; //Google DirectionsServive object
 				thisObj.resultsDiv = null; //where results from Google Directions API html will be put
@@ -860,13 +860,13 @@ if ( !class_exists( 'Simple_Map' ) ) {
 						*/
 
 						thisObj.service = new google.maps.DirectionsService();
-					}
+					};
 				}
 
 				if(typeof(thisObj.clearDirections)==='undefined') {//guarantees one time prototyping 
 					GmapDirections.prototype.clearDirections = function () {
 						thisObj.display.set('directions', null);
-					}
+					};
 				}
 
 				/**
@@ -905,17 +905,15 @@ if ( !class_exists( 'Simple_Map' ) ) {
 							//keep track of markers
 							thisObj.markerWaypoints[i] = marker;
 						}
-					}
+					};
 				}
 
 				/**
 				 * Get the directions from google
-				 * @param string start (start address) //defaults to on page startPoint address
-				 * @param integer endLat  //number from placemark. But it could be an Address string
-				 * @param integer endLng  //number from placemark. But if endLat is an address, this value should be "address" as an indicator.
+				 * @param string start Optional (start address) //defaults to on page startPoint address
 				 */
 				if(typeof(thisObj.computeDirections)==='undefined') {//guarantees one time prototyping 
-					GmapDirections.prototype.computeDirections = function (start, endLat, endLng) {
+					GmapDirections.prototype.computeDirections = function (start) {
 
 						//if startPoint does not exist, then create it
 						var startAddress = null;
@@ -946,7 +944,7 @@ if ( !class_exists( 'Simple_Map' ) ) {
 
 						startPoint.innerHTML = startAddress; //sets it in case it is the first address from infowindow
 						//need to remove the last waypoint object because it is the same as our destination, and destination is required to be passed in
-						if (thisObj.endWaypoint == "") {
+						if (thisObj.endWaypoint === "") {
 							//there are no more waypoints so clear map and results of directions
 							thisObj.clearDirections();
 						}
@@ -976,7 +974,7 @@ if ( !class_exists( 'Simple_Map' ) ) {
 							thisObj.addStop(endLat, endLng, savedEndPoint.title, null, true);
 						}
 
-					} // end computeDirections
+					}; // end computeDirections
 				}
 
 				if(typeof(thisObj.wrapInfowindow)==='undefined') {//guarantees one time prototyping 
@@ -1005,7 +1003,7 @@ if ( !class_exists( 'Simple_Map' ) ) {
 						windowContent +
 						"</div>";
 						return wrapper;
-					}
+					};
 				}
 
 				if(typeof(thisObj.setDirections)==='undefined') {//guarantees one time prototyping 
@@ -1022,7 +1020,7 @@ if ( !class_exists( 'Simple_Map' ) ) {
 								} 
 								else {
 									thisObj.addStop(lat, lng, title, null, true); //TODO: embed start address more into directions object instead of relying on gd-startPoint value
-									thisObj.computeDirections(start, lat, lng);
+									thisObj.computeDirections(start);
 									infoWindow.close();
 								}
 							});
@@ -1036,12 +1034,12 @@ if ( !class_exists( 'Simple_Map' ) ) {
 								infoWindow.close();
 							});
 						});
-					}
+					};
 				}
 
 				/************ Functions for managing waypoints or "Stops" along the route ***************/
 
-				thisObj.waypoints = new Array(); //associative array with geohash as keys and values as waypoints objects for Google's Directions waypoints
+				thisObj.waypoints = []; //associative array with geohash as keys and values as waypoints objects for Google's Directions waypoints
 				thisObj.waypointsLength = 0; //keep track of length of associative array
 				thisObj.startWaypoint = "";
 				thisObj.endWaypoint = "";
@@ -1057,11 +1055,11 @@ if ( !class_exists( 'Simple_Map' ) ) {
 							gWaypoint = {
 								location : waypoint.location,
 								stopover : waypoint.stopover
-							}
+							};
 							arrayStops.push(gWaypoint);
 						}
 						return arrayStops;
-					}
+					};
 				}
 
 				//setNewEndpoint with geoHashKey parameter or iterates through associative array and assigns thisObj.endWaypoint to the last value
@@ -1075,13 +1073,13 @@ if ( !class_exists( 'Simple_Map' ) ) {
 							}
 						}
 						return thisObj.endWaypoint;
-					}
+					};
 				}
 
 				if(typeof(thisObj.setStops)==='undefined') {//guarantees one time prototyping 
 					GmapDirections.prototype.setStops = function (directionWaypoints) {
 						thisObj.waypoints = directionWaypoints;
-					}
+					};
 				}
 
 				if(typeof(thisObj.addStop)==='undefined') {//guarantees one time prototyping 
@@ -1099,10 +1097,10 @@ if ( !class_exists( 'Simple_Map' ) ) {
 						};
 						thisObj.waypointsLength += 1;
 					};
-  				}
+				}
 
-  				if(typeof(thisObj.removeStop)==='undefined') { //guarantees one time prototyping 
-  					GmapDirections.prototype.removeStop = function(geoHashorLat, lng) {
+				if(typeof(thisObj.removeStop)==='undefined') { //guarantees one time prototyping 
+					GmapDirections.prototype.removeStop = function(geoHashorLat, lng) {
 						var gHash = "";
 						if (!lng) {
 							//second parameter was missing so assume indexOrLat is an index
@@ -1124,8 +1122,8 @@ if ( !class_exists( 'Simple_Map' ) ) {
 							console.log(gHash + " could not be deleted. Call was to .removeStop(" + geoHashorLat + ", " + lng + ") and error is: " + e);
 						}
 						return gHash;
-	  				};
-  				}
+					};
+				}
 			} // end of GmapDirections 'class'
 
 			directions = new GmapDirections('simplemap'); //creates new GmapDirections object to allow user to get directions between different markers (a.k.a. stops or waypoints)
@@ -1814,7 +1812,7 @@ if ( !class_exists( 'Simple_Map' ) ) {
 				var html = '<div id="location_' + locationData.postid + '" class="result">';
 
 				// Flagged special
-				if (locationData.special == 1 && special_text != '') {
+				if (locationData.special == 1 && special_text != '') 	{
 					html += '<div class="special">' + special_text + '</div>';
 				}
 
