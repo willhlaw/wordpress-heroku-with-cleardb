@@ -865,7 +865,12 @@ if ( !class_exists( 'Simple_Map' ) ) {
 
 				if(typeof(thisObj.clearDirections)==='undefined') {//guarantees one time prototyping 
 					GmapDirections.prototype.clearDirections = function () {
+						//clear directions results and blue directional line(s) from map
 						thisObj.display.set('directions', null);
+						//clear waypoint markers from map
+						for (var i = markerWaypoints.length - 1; i >= 0; i-- ) {
+						  	markersArray[i].setMap(null);
+						}
 					};
 				}
 
@@ -933,7 +938,8 @@ if ( !class_exists( 'Simple_Map' ) ) {
 				 */
 				if(typeof(thisObj.computeDirections)==='undefined') {//guarantees one time prototyping 
 					GmapDirections.prototype.computeDirections = function (start) {
-
+						//reset directions related items first before creating new ones
+						thisObj.clearDirections();
 						//if startPoint does not exist, then create it
 						var startAddress = null;
 						var startPoint = document.getElementById(thisObj.startPointID); //startPointDivID default is 'gd-startPoint'
