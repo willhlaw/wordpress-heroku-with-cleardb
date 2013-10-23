@@ -878,19 +878,38 @@ if ( !class_exists( 'Simple_Map' ) ) {
 						var theRoute = directionResult.routes[0].legs;
 						var stepDisplay = new google.maps.InfoWindow();
 						//set up the first icon of the strip and show the starting address when it is clicked
-						var marker = new google.maps.Marker({
+						var startMarker = new google.maps.Marker({
 							position: theRoute[0].start_location,
 							map: map
 						});	
-						google.maps.event.addListener(marker, 'click', function() {
+						google.maps.event.addListener(startMarker, 'click', function() {
 							stepDisplay.setContent(theRoute[0].start_address); //Show the starting address
-							stepDisplay.open(map, marker);
+							stepDisplay.open(map, startMarker);
 						});
+						var directionsImage = [];
+						directionsImage[0] = "http://maps.gstatic.com/mapfiles/markers2/icon_greenA.png";
+						directionsImage[1] = "http://maps.gstatic.com/mapfiles/markers2/icon_greenB.png";
+						directionsImage[2] = "http://maps.gstatic.com/mapfiles/markers2/icon_greenC.png";
+						directionsImage[3] = "http://maps.gstatic.com/mapfiles/markers2/icon_greenD.png";
+						directionsImage[4] = "http://maps.gstatic.com/mapfiles/markers2/icon_greenE.png";
+						directionsImage[5] = "http://maps.gstatic.com/mapfiles/markers2/icon_greenF.png";
+						directionsImage[6] = "http://maps.gstatic.com/mapfiles/markers2/icon_greenG.png";
+						directionsImage[7] = "http://maps.gstatic.com/mapfiles/markers2/icon_greenH.png";
+						directionsImage[8] = "http://maps.gstatic.com/mapfiles/markers2/icon_greenI.png";
+						directionsImage[9] = "http://maps.gstatic.com/mapfiles/markers2/icon_greenJ.png";
+						directionsImage[10] = "http://maps.gstatic.com/mapfiles/markers2/icon_greenK.png";
+						directionsImage[11] = "http://maps.gstatic.com/mapfiles/markers2/icon_greenL.png";
+						directionsImage[12] = "http://maps.gstatic.com/mapfiles/markers2/icon_greenM.png";
+						directionsImage[13] = "http://maps.gstatic.com/mapfiles/markers2/icon_greenN.png";
+						directionsImage[14] = "http://maps.gstatic.com/mapfiles/markers2/icon_greenO.png";
+						directionsImage[15] = "http://maps.gstatic.com/mapfiles/markers2/icon_greenP.png";
 						console.log("number of adp direction icons: " + jQuery('.adp-marker').length);
+						var marker;
 						for (var i = 0; i < theRoute.length; i++) {
 							marker = new google.maps.Marker({
 								position: theRoute[i].end_location,
 								map: map,
+								icon: directionsImage[i],
 								clickable: false
 							});
 							google.maps.event.addListener(marker, 'click', function() {
