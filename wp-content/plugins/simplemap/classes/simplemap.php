@@ -1575,7 +1575,7 @@ if ( !class_exists( 'Simple_Map' ) ) {
 						}
 
 						var searchMarker = new google.maps.Marker( searchMarkerOptions );
-						searchMarker.title = searchMarkerTitle;)
+						searchMarker.title = searchMarkerTitle;
 						markersArray.push(searchMarker); //add geoHash for gMapDirections
 						bounds.extend(searchMarkerOptions.position);
 					}
