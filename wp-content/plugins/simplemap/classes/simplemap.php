@@ -868,8 +868,8 @@ if ( !class_exists( 'Simple_Map' ) ) {
 						//clear directions results and blue directional line(s) from map
 						thisObj.display.set('directions', null);
 						//clear waypoint markers from map
-						for (var i = markerWaypoints.length - 1; i >= 0; i-- ) {
-						  	markersArray[i].setMap(null);
+						for (var i = thisObj.markerWaypoints.length - 1; i >= 0; i-- ) {
+						  	thisObj.markerWaypoints[i].setMap(null);
 						}
 					};
 				}
