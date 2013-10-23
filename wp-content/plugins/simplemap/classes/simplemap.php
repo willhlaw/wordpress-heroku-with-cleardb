@@ -882,15 +882,8 @@ if ( !class_exists( 'Simple_Map' ) ) {
 					GmapDirections.prototype.showSteps = function (directionResult) {
 						var theRoute = directionResult.routes[0].legs;
 						var stepDisplay = new google.maps.InfoWindow();
-						//set up the first icon of the strip and show the starting address when it is clicked
-						var startMarker = new google.maps.Marker({
-							position: theRoute[0].start_location,
-							map: map
-						});	
-						google.maps.event.addListener(startMarker, 'click', function() {
-							stepDisplay.setContent(theRoute[0].start_address); //Show the starting address
-							stepDisplay.open(map, startMarker);
-						});
+
+						//TODO, programmatically determine these images after directions results get seet
 						var directionsImage = [];
 						directionsImage[0] = "http://maps.gstatic.com/mapfiles/markers2/icon_greenA.png";
 						directionsImage[1] = "http://maps.gstatic.com/mapfiles/markers2/icon_greenB.png";
@@ -908,25 +901,26 @@ if ( !class_exists( 'Simple_Map' ) ) {
 						directionsImage[13] = "http://maps.gstatic.com/mapfiles/markers2/icon_greenN.png";
 						directionsImage[14] = "http://maps.gstatic.com/mapfiles/markers2/icon_greenO.png";
 						directionsImage[15] = "http://maps.gstatic.com/mapfiles/markers2/icon_greenP.png";
-						console.log("number of adp direction icons: " + jQuery('.adp-marker').length);
+						//set up the first icon of the strip and show the starting address when it is clicked
+						var startMarker = new google.maps.Marker({
+							position: theRoute[0].start_location,
+							icon: directionsImage[0],
+							zIndex: google.maps.Marker.MAX_ZINDEX,
+							map: map
+						});	
+						google.maps.event.addListener(startMarker, 'click', function() {
+							stepDisplay.setContent(theRoute[0].start_address); //Show the starting address
+							stepDisplay.open(map, startMarker);
+						});
 						var marker;
 						for (var i = 0; i < theRoute.length; i++) {
 							marker = new google.maps.Marker({
 								position: theRoute[i].end_location,
 								map: map,
-								icon: directionsImage[i],
+								icon: directionsImage[i+1],
 								zIndex: google.maps.Marker.MAX_ZINDEX + 1,
 								clickable: false
 							});
-							google.maps.event.addListener(marker, 'click', function() {
-								//TODO: find same placemark and open it's infowindow
-								var geoHash = Fgh.encode(marker.position.lat(), marker.position.lng(), thisObj.geoHashBitLen);
-								var text = "test"; //gets text from placemark markers
-								console.log("markerWaypoint: " + geoHash);
-								stepDisplay.setContent(text);
-								stepDisplay.open(map, marker);
-							});
-
 							//keep track of markers
 							thisObj.markerWaypoints[i] = marker;
 						}
@@ -1116,7 +1110,6 @@ if ( !class_exists( 'Simple_Map' ) ) {
 					GmapDirections.prototype.addStop = function(lat, lng, title, isStart, isEnd, stopOverFlag) {
 						var latlngString = "" + lat + "," + lng;
 						var gHash = Fgh.encode(lat, lng, thisObj.geoHashBitLen); //aim with 3rd parameter, bitlen, is to geohash to close-by markers to a one or two character difference for unique comparison and find matches between marker directions and waypoints.
-						console.log(latlngString + " translates to geoHash: " + gHash);
 						thisObj.startWaypoint = (!isStart) ? thisObj.startWaypoint : gHash;
 						thisObj.endWaypoint = (!isEnd) ? thisObj.endWaypoint : gHash;
 						var stopOver = stopOverFlag || true; //default is true, to add waypoint to route as a marker
