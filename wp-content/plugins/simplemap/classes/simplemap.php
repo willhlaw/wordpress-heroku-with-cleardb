@@ -915,6 +915,7 @@ if ( !class_exists( 'Simple_Map' ) ) {
 								position: theRoute[i].end_location,
 								map: map,
 								icon: directionsImage[i],
+								zIndex: google.maps.Marker.MAX_ZINDEX + 1,
 								clickable: false
 							});
 							google.maps.event.addListener(marker, 'click', function() {
