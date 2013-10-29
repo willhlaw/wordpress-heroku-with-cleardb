@@ -933,13 +933,14 @@ if ( !class_exists( 'Simple_Map' ) ) {
 						}
 
 						//set event when direction markers and results are finished to be able to update the address results div with the title of the placemark
-						google.maps.event.addListener(thisObj.display, 'directions_changed',function() {
+						//google.maps.event.addListener(thisObj.display, 'directions_changed',function() { //this fired too often
+						setTimeout(function() {
 							var titles = jQuery(".adp-text");
 							//loop through titles but stop before getting to the first one, which is the start address and has no title
 							for (var i = titles.length - 2; i > 0; i--) {
 								jQuery(".adp-text").eq(i).prepend("<div class='gd-placeName'>" + thisObj.markerWaypoints[i-1].title + "</div>");
 							}
-						});
+						}, 1000);
 					};
 				}
 
