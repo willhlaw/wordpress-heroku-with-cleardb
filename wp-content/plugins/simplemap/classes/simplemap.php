@@ -872,7 +872,11 @@ if ( !class_exists( 'Simple_Map' ) ) {
 						for (var i = thisObj.markerWaypoints.length - 1; i >= 0; i-- ) {
 						  	thisObj.markerWaypoints[i].setMap(null);
 						}
-						thisObj.startMarker.setMap(null);
+						//clear start marker, if it exists;
+						if (thisObj.startMarker !== null) {
+							thisObj.startMarker.setMap(null);
+						}
+						
 					};
 				}
 
