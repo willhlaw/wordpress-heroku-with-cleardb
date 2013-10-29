@@ -913,6 +913,8 @@ if ( !class_exists( 'Simple_Map' ) ) {
 							stepDisplay.open(map, startMarker);
 						});
 						var marker;
+						var geoHash; //for matching up with the waypoints title
+						var title = "";
 						for (var i = 0; i < theRoute.length; i++) {
 							marker = new google.maps.Marker({
 								position: theRoute[i].end_location,
@@ -921,9 +923,22 @@ if ( !class_exists( 'Simple_Map' ) ) {
 								zIndex: google.maps.Marker.MAX_ZINDEX + 1,
 								clickable: false
 							});
+							//update the direction results with the title by matching the marker geohash with the corresponding waypoints and using the title
+							geoHash = Fgh.encode(marker.position.lat(), marker.position.lng(), thisObj.geoHashBitLen);
+							title = thisObj.waypoints[geoHash].name;
+							marker.title = title;
+
 							//keep track of markers
 							thisObj.markerWaypoints[i] = marker;
 						}
+
+						//set event when direction markers and results are finished to be able to update the address results div with the title of the placemark
+						google.maps.event.addListener(directionsDisplay, 'directions_changed',function() {
+							var titles = jQuery(".adp-text");
+							//loop through titles but stop before getting to the first one, which is the start address and has no title
+							for (var i = titles.length - 1; i > 0; i--) {
+								jQuery(".adp-text").eq(i).prepend("<div class='gd-placeName'>" + thisObj.markerWaypoints[i].title + "</div>");
+							}
 					};
 				}
 
