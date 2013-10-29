@@ -936,8 +936,8 @@ if ( !class_exists( 'Simple_Map' ) ) {
 						google.maps.event.addListener(thisObj.display, 'directions_changed',function() {
 							var titles = jQuery(".adp-text");
 							//loop through titles but stop before getting to the first one, which is the start address and has no title
-							for (var i = titles.length - 1; i > 0; i--) {
-								jQuery(".adp-text").eq(i).prepend("<div class='gd-placeName'>" + thisObj.markerWaypoints[i].title + "</div>");
+							for (var i = titles.length - 2; i > 0; i--) {
+								jQuery(".adp-text").eq(i).prepend("<div class='gd-placeName'>" + thisObj.markerWaypoints[i-1].title + "</div>");
 							}
 						});
 					};
@@ -1007,7 +1007,7 @@ if ( !class_exists( 'Simple_Map' ) ) {
 							//add endpoint back to waypoints because we removed it above only temporarily
 							var endLat = savedEndPoint.location.split(",")[0];
 							var endLng = savedEndPoint.location.split(",")[1];
-							thisObj.addStop(endLat, endLng, savedEndPoint.title, null, true);
+							thisObj.addStop(endLat, endLng, savedEndPoint.name, null, true);
 						}
 
 					}; // end computeDirections
