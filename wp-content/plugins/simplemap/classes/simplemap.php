@@ -908,7 +908,7 @@ if ( !class_exists( 'Simple_Map' ) ) {
 						directionsImage[14] = "http://maps.gstatic.com/mapfiles/markers2/icon_greenO.png";
 						directionsImage[15] = "http://maps.gstatic.com/mapfiles/markers2/icon_greenP.png";
 						//set up the first icon of the strip and show the starting address when it is clicked
-						startMarker = new google.maps.Marker({
+						thisObj.startMarker = new google.maps.Marker({
 							position: theRoute[0].start_location,
 							icon: directionsImage[0],
 							zIndex: google.maps.Marker.MAX_ZINDEX,
