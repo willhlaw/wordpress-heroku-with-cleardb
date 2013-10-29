@@ -933,7 +933,7 @@ if ( !class_exists( 'Simple_Map' ) ) {
 						}
 
 						//set event when direction markers and results are finished to be able to update the address results div with the title of the placemark
-						google.maps.event.addListener(directionsDisplay, 'directions_changed',function() {
+						google.maps.event.addListener(thisObj.display, 'directions_changed',function() {
 							var titles = jQuery(".adp-text");
 							//loop through titles but stop before getting to the first one, which is the start address and has no title
 							for (var i = titles.length - 1; i > 0; i--) {
