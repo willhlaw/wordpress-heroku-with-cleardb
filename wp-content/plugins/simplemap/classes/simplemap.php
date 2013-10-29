@@ -914,7 +914,7 @@ if ( !class_exists( 'Simple_Map' ) ) {
 							zIndex: google.maps.Marker.MAX_ZINDEX,
 							map: map
 						});	
-						google.maps.event.addListener(startMarker, 'click', function() {
+						google.maps.event.addListener(thisObj.startMarker, 'click', function() {
 							stepDisplay.setContent(theRoute[0].start_address); //Show the starting address
 							stepDisplay.open(map, startMarker);
 						});
