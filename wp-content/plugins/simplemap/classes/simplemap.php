@@ -816,6 +816,7 @@ if ( !class_exists( 'Simple_Map' ) ) {
 				thisObj.resultsDiv = null; //where results from Google Directions API html will be put
 				thisObj.resultsDivId = null; 
 				thisObj.markerWaypoints = []; //marker array for direction results
+				thisObj.startMarker = null; //placemark for start address of a trip
 				thisObj.geoHashBitLen = options.geoHashBitLen || 24; //used for Fgh encode function where bitlen purpose is to geohash to close-by markers to a one or two character difference for unique comparison and find matches between marker directions and waypoints.
 
 				//set options or defaults
@@ -871,6 +872,7 @@ if ( !class_exists( 'Simple_Map' ) ) {
 						for (var i = thisObj.markerWaypoints.length - 1; i >= 0; i-- ) {
 						  	thisObj.markerWaypoints[i].setMap(null);
 						}
+						thisObj.startMarker.setMap(null);
 					};
 				}
 
@@ -902,7 +904,7 @@ if ( !class_exists( 'Simple_Map' ) ) {
 						directionsImage[14] = "http://maps.gstatic.com/mapfiles/markers2/icon_greenO.png";
 						directionsImage[15] = "http://maps.gstatic.com/mapfiles/markers2/icon_greenP.png";
 						//set up the first icon of the strip and show the starting address when it is clicked
-						var startMarker = new google.maps.Marker({
+						startMarker = new google.maps.Marker({
 							position: theRoute[0].start_location,
 							icon: directionsImage[0],
 							zIndex: google.maps.Marker.MAX_ZINDEX,
