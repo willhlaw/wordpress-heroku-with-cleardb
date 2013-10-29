@@ -939,6 +939,7 @@ if ( !class_exists( 'Simple_Map' ) ) {
 							for (var i = titles.length - 1; i > 0; i--) {
 								jQuery(".adp-text").eq(i).prepend("<div class='gd-placeName'>" + thisObj.markerWaypoints[i].title + "</div>");
 							}
+						});
 					};
 				}
 
