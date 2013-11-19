@@ -1222,7 +1222,13 @@ if ( !class_exists( 'Simple_Map' ) ) {
 			}
 			table += ('</tr></table>');
 			parent.html(table);
-			}("#location_search_sm-category_fields", ')'); //call function to arrange category labels into a table with columns
+			};
+
+			//wait until page loads and DOM is ready before
+			//calling function to arrange category labels into a table with columns
+			jQuery(document).ready( function () {
+				arrangeCategoryColumns("#location_search_sm-category_fields", ')'); 
+			});
 
 
 			function clearInfoWindows() {
