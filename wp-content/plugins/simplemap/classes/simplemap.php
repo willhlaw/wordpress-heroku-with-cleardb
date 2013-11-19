@@ -1174,6 +1174,57 @@ if ( !class_exists( 'Simple_Map' ) ) {
 
 			directions = new GmapDirections('simplemap'); //creates new GmapDirections object to allow user to get directions between different markers (a.k.a. stops or waypoints)
 
+			/* Function: arrangeCategoryColumns 
+						 * Author: willhlaw <will.lawrence [at] gmail>
+						 * Dependencies: jQuery needs to be instantiated.
+						 * Purpose: Turns a list of DOM items that match jQuery(strLabelSelector) and turns each unique string, or type, in front of the item's delimeter 
+						 * into headers (with special characters removed) of a side by side column of items. 
+						 * Additional instructions: A table is created with tr class="column-tr" and td class="column-td type"
+						 * Example: (a) apple (b) bananna (b) berries 
+						 * -> a        b
+						 *    apple    bannana
+						 *             berries
+						 */
+			var arrangeCategoryColumns = function(strLabelSelector, delimeter) {
+			//Sort labels by type into an array
+			//categories[type] = {labels[]}
+			var labels = jQuery(strLabelSelector).children();
+			var categories = [];
+			var type, label;
+			var categoryName;
+			for (var i = 0; i < labels.length; i++) {
+			    name = labels.get(i).innerText;
+			    type = jQuery.trim(name.split(delimeter)[0].replace(/[^\w\s]/gi, '')); //remove special characters and leading and trailing whitespace
+			    var categoryItem = {};
+			    categoryItem.label = name.split(')')[1];
+			    categoryItem.HTML = labels.get(i).outerHTML;
+			    if (categories[type] === undefined) {
+			        categories[type] = [categoryItem];
+			    } else {
+			        categories[type].push(categoryItem);
+			    }
+			}
+
+			//create a table with type.length number of columns
+			//type1 | type2
+			//------|------
+			//item11| item21
+			//item12| item22
+			var parent = labels.parent();
+			var table = '<table>'; 
+			table += '<tr style="vertical-align: top; text-align: left" class="category-tr">';
+			for (var type in categories) {
+			    table += '<td class="category-td ' + type + '">' + type;
+			    for (var categoryItem in categories[type]) {
+			        table += '</br>' + categories[type][categoryItem].HTML.replace(/\((.+)\)/, '');
+			    }
+			    table += '</td>';
+			}
+			table += ('</tr></table>');
+			parent.html(table);
+			}("#location_search_sm-category_fields", ')'); //call function to arrange category labels into a table with columns
+
+
 			function clearInfoWindows() {
 				if (infowindowsArray) {
 					for (var i=0;i<infowindowsArray.length;i++) {
