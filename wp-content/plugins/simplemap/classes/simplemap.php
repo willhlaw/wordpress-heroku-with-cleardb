@@ -987,7 +987,7 @@ if ( !class_exists( 'Simple_Map' ) ) {
 							startPoint = document.getElementById(thisObj.startPointID);
 							startAddress = start;
 						} else {
-							startAddress = startPoint.value || startPoint.innerHTML; //accounts for when startPoint is an input or a span
+							startAddress = startPoint.value || startPoint.innerHTML || start; //accounts for when startPoint is an input or a span
 						}
 
 						startPoint.value = startPoint.HTML = startAddress; //sets it in case it is the first address from infowindow
