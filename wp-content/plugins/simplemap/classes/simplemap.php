@@ -67,6 +67,8 @@ if ( !class_exists( 'Simple_Map' ) ) {
 			// Updating Div
 			$sm_updating_img_src = apply_filters( 'sm_updating_img_src', SIMPLEMAP_URL . '/inc/images/loading.gif' );
 			$sm_updating_div_size = apply_filters( 'sm_updating_img_size', 'height:' . $map_height . ';width:' . $map_width . ';' );
+			//add map_top here instead of bottom of input form search 
+			$to_display .= '<a id="map_top"></a>';
 			$to_display .= '<div id="simplemap-updating" style="'. $sm_updating_div_size. '"><img src="' . $sm_updating_img_src . '" alt="' . __( 'Loading new locations', 'SimpleMap' ) . '" /></div>';
 
 			$to_display .= '<div id="simplemap" style="' . $hidemap . 'width: ' . $map_width . '; height: ' . $map_height . ';"></div>';
@@ -240,7 +242,7 @@ if ( !class_exists( 'Simple_Map' ) ) {
 			$hidesearch = $hide_search ? " style='display:none;' " : '';
 
 			$location_search  = '<div id="map_search" >';
-			$location_search .= '<a id="map_top"></a>';
+			//$location_search .= '<a id="map_top"></a>';
 			$location_search .= '<form ' . $on_submit . ' name="location_search_form" id="location_search_form" action="' . $action . '" method="' . $method . '">';
 
 			$location_search .= '<table class="location_search"' . $hidesearch . '>';
