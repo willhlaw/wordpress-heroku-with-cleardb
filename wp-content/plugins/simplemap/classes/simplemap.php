@@ -822,7 +822,7 @@ if ( !class_exists( 'Simple_Map' ) ) {
 				thisObj.geoHashBitLen = options.geoHashBitLen || 24; //used for Fgh encode function where bitlen purpose is to geohash to close-by markers to a one or two character difference for unique comparison and find matches between marker directions and waypoints.
 
 				//set options or defaults
-				thisObj.mapContainerId = mapContainerId || 'simplemap';
+				thisObj.mapContainerId = mapContainerId || opts.mapContainerId || 'simplemap';
 				thisObj.directionRendererOpts = options.directionRendererOpts || ({
 					suppressMarkers: true, 
 					preserveViewport: false, 
@@ -833,6 +833,7 @@ if ( !class_exists( 'Simple_Map' ) ) {
 				thisObj.resultsDivId = options.resultsDivId || thisObj.mapContainerId + "-results";
 
 				thisObj.startPointDivID = options.startPointDivID || "gd-start";
+				thisObj.startPointLabel = options.startPointLabel || "Your trip's starting address:";
 				thisObj.startPointID = options.startPointID || "gd-startPoint";
 
 				if(typeof(thisObj.setDisplay)==='undefined') {//guarantees one time prototyping 
@@ -966,7 +967,7 @@ if ( !class_exists( 'Simple_Map' ) ) {
 						if (!startPoint) {
 							var startPointDiv = document.createElement("div");
 							startPointDiv.id = thisObj.startPointDivID;
-							startPointDiv.innerHTML =  "<table style='margin-top: 2px; width: 0'><tr><td>" + "<label for='" + thisObj.startPointID + "'>Your trip's starting address:</label>" + "</td>" +
+							startPointDiv.innerHTML =  "<table style='margin-top: 2px; width: 0'><tr><td>" + "<label for='" + thisObj.startPointID + "'>" + thisObj.startPointLabel + "</label>" + "</td>" +
 							"<td>" + "<span contenteditable='true' id=" + thisObj.startPointID + " style='border: 1px solid #ddd; margin-top: 4px' />" + "</td>" +
 							"<td>" + "<input type='button' id='gd-reGetDirections' value='Recalculate Trip' />" + "</td>" +
 							"<td>" + "<input type='button' id='gd-clearDirections' value='Clear Trip' />" + "</td>" +
@@ -1174,7 +1175,11 @@ if ( !class_exists( 'Simple_Map' ) ) {
 				}
 			} // end of GmapDirections 'class'
 
-			directions = new GmapDirections('simplemap'); //creates new GmapDirections object to allow user to get directions between different markers (a.k.a. stops or waypoints)
+			//create options for the directions object and combine the starting point of the trip with the address field already being used for search
+			var options = {
+				startPointID : "location_search_address_field"
+			}
+			directions = new GmapDirections('simplemap', options); //creates new GmapDirections object to allow user to get directions between different markers (a.k.a. stops or waypoints)
 
 			/* Function: arrangeCategoryColumns 
 						 * Author: willhlaw <will.lawrence [at] gmail>
@@ -2837,7 +2842,7 @@ if ( !class_exists( 'Simple_Map' ) ) {
 			}
 
 			$atts = $tax_atts + array(
-				'search_title'				=> __( 'Find Locations Near:', 'SimpleMap' ), 
+				'search_title'				=> __( 'Starting Location or Find Locations Near:', 'SimpleMap' ), 
 				'search_form_type'			=> 'table', 
 				'search_form_cols'			=> 3, 
 				'search_fields'				=> 'labelbr_street||labelbr_city||labelbr_state||labelbr_zip||empty||empty||labeltd_distance||empty' . implode('', $tax_search_fields) . '||submit||empty||empty', 
