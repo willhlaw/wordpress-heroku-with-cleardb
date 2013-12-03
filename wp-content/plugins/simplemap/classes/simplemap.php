@@ -212,11 +212,11 @@ if ( !class_exists( 'Simple_Map' ) ) {
 			$is_sm_search		= isset( $_REQUEST['location_is_search_results'] ) ? 1 : 0;
 
 			// Normal Field inputs
-			$ffi['street']		= array( 'label' => apply_filters( 'sm-search-label-street', __( 'Address: ', 'SimpleMap' ), $post ), 'input' => '<input type="text" id="location_search_address_field" name="location_search_address" width="354px" value="' . esc_attr( $address_value ) . '" />' );
-			$ffi['city']		= array( 'label' => apply_filters( 'sm-search-label-city', __( 'City: ', 'SimpleMap' ), $post ), 'input' => '<input type="text"  id="location_search_city_field" name="location_search_city" style="display:none" value="' . esc_attr( $city_value ) . '" />' );
-			$ffi['state']		= array( 'label' => apply_filters( 'sm-search-label-state', __( 'State: ', 'SimpleMap' ), $post ), 'input' => '<input type="text" id="location_search_state_field" name="location_search_state" style="display:none" value="' . esc_attr( $state_value ) . '" />' );
-			$ffi['zip']			= array( 'label' => apply_filters( 'sm-search-label-zip', __( 'Zip: ', 'SimpleMap' ), $post ), 'input' => '<input type="text" id="location_search_zip_field" name="location_search_zip" style="display:none" value="' . esc_attr( $zip_value ) . '" />' );
-			$ffi['country']		= array( 'label' => apply_filters( 'sm-search-label-country', __( 'Country: ', 'SimpleMap' ), $post ), 'input' => '<input type="text" id="location_search_country_field" name="location_search_country" style="display:none" value="' . esc_attr( $country_value ) . '" />' );
+			$ffi['street']		= array( 'label' => apply_filters( 'sm-search-label-street', __( 'Address: ', 'SimpleMap' ), $post ), 'input' => '<input type="text" id="location_search_address_field" name="location_search_address" value="' . esc_attr( $address_value ) . '" />' );
+			$ffi['city']		= array( 'label' => apply_filters( 'sm-search-label-city', __( 'City: ', 'SimpleMap' ), $post ), 'input' => '<input type="text"  id="location_search_city_field" name="location_search_city" value="' . esc_attr( $city_value ) . '" />' );
+			$ffi['state']		= array( 'label' => apply_filters( 'sm-search-label-state', __( 'State: ', 'SimpleMap' ), $post ), 'input' => '<input type="text" id="location_search_state_field" name="location_search_state" value="' . esc_attr( $state_value ) . '" />' );
+			$ffi['zip']			= array( 'label' => apply_filters( 'sm-search-label-zip', __( 'Zip: ', 'SimpleMap' ), $post ), 'input' => '<input type="text" id="location_search_zip_field" name="location_search_zip" value="' . esc_attr( $zip_value ) . '" />' );
+			$ffi['country']		= array( 'label' => apply_filters( 'sm-search-label-country', __( 'Country: ', 'SimpleMap' ), $post ), 'input' => '<input type="text" id="location_search_country_field" name="location_search_country" value="' . esc_attr( $country_value ) . '" />' );
 			$ffi['empty']		= array( 'label' => '', 'input' => '' );
 			$ffi['submit']		= array( 'label' => '', 'input' => '<input type="submit" value="' . apply_filters( 'sm-search-label-search', __('Search', 'SimpleMap'), $post ) . '" id="location_search_submit_field" class="submit" />' );
 			$ffi['distance']	= $this->add_distance_field( $radius_value, $units );
