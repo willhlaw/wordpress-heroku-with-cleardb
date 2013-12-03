@@ -51,8 +51,6 @@ if ( !class_exists( 'Simple_Map' ) ) {
 
 			$to_display = '';
 
-			$to_display .= $this->location_search_form( $atts );
-
 			if ( $powered_by )
 				$to_display .= '<div id="powered_by_simplemap">' . sprintf( __( 'Powered by %s SimpleMap', 'SimpleMap' ), '<a href="http://simplemap-plugin.com/" target="_blank">' ) . '</a></div>';
 
@@ -72,6 +70,10 @@ if ( !class_exists( 'Simple_Map' ) ) {
 			$to_display .= '<div id="simplemap-updating" style="'. $sm_updating_div_size. '"><img src="' . $sm_updating_img_src . '" alt="' . __( 'Loading new locations', 'SimpleMap' ) . '" /></div>';
 
 			$to_display .= '<div id="simplemap" style="' . $hidemap . 'width: ' . $map_width . '; height: ' . $map_height . ';"></div>';
+
+			//Display input search
+			$to_display .= $this->location_search_form( $atts );
+
 			$to_display .= '<div id="results" style="' . $hidelist . 'width: ' . $map_width . ';"></div>';
 			$to_display .= '<script type="text/javascript">';
 			$to_display .= '(function($) { ';
