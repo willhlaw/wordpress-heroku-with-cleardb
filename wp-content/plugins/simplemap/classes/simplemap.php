@@ -985,10 +985,10 @@ if ( !class_exists( 'Simple_Map' ) ) {
 							startPoint = document.getElementById(thisObj.startPointID);
 							startAddress = start;
 						} else {
-							startAddress = startPoint.innerHTML;
+							startAddress = startPoint.value || startPoint.innerHTML; //accounts for when startPoint is an input or a span
 						}
 
-						startPoint.innerHTML = startAddress; //sets it in case it is the first address from infowindow
+						startPoint.value = startPoint.HTML = startAddress; //sets it in case it is the first address from infowindow
 						//need to remove the last waypoint object because it is the same as our destination, and destination is required to be passed in
 						if (thisObj.endWaypoint === "") {
 							//there are no more waypoints so clear map and results of directions
@@ -1011,7 +1011,7 @@ if ( !class_exists( 'Simple_Map' ) ) {
 									thisObj.showSteps(response);
 								} else {
 									alert('Error generating directions. Please try entering another address.');
-									startPoint.innerHTML = "Please try another address";
+									startPoint.value = startPoint.innerHTML = "Please try another address";
 								}
 							});
 							//add endpoint back to waypoints because we removed it above only temporarily
@@ -1031,7 +1031,7 @@ if ( !class_exists( 'Simple_Map' ) ) {
 						var input = "";
 						var addButton = "<input type='button' id='gd-goGetDirections' value='Add to Trip' />";
 						var removeButton = "<input type='button' id='gd-removeAndGetDirections' value='Drop from Trip' />";
-						if (!document.getElementById(thisObj.startPointID) || !document.getElementById(thisObj.startPointID).innerHTML) {
+						if (!document.getElementById(thisObj.startPointID) || !(document.getElementById(thisObj.startPointID).innerHTML || document.getElementById(thisObj.startPointID).value)) {
 							//no address has been set, so prompt user inside infowindow for first time
 							label = "<label>Would you like to go here? (Enter your starting address):</label>";							
 							input = "<input type='text' id='gd-startAddress' />";
