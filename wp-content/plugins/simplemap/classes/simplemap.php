@@ -1202,7 +1202,7 @@ if ( !class_exists( 'Simple_Map' ) ) {
 			var type, label;
 			var categoryName;
 			for (var i = 0; i < labels.length; i++) {
-			    name = labels.get(i).innerText;
+			    name = labels.get(i).innerText || labels.get(i).textContent; //Firefox does not use .innerText, instead, it uses .textContent. 
 			    type = jQuery.trim(name.split(delimeter)[0].replace(/[^\w\s]/gi, '')); //remove special characters and leading and trailing whitespace
 			    var categoryItem = {};
 			    categoryItem.label = name.split(')')[1];
