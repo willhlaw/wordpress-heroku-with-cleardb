@@ -1205,28 +1205,14 @@ if ( !class_exists( 'Simple_Map' ) ) {
 				}
 			} // end of GmapDirections 'class'
 
-			var directionsOn = <?php echo $isset ( $options['directions_for_maps'] ) ? $options['directions_for_maps'] : 'true';?> || true;
-			if (directionsOn || directionsOn == 'checked') {
-				//create options for the directions object and combine the starting point of the trip with the address field already being used for search and turn on recalculate and clear directions buttons
-				var directionsStringFromOptions = <?php echo $isset( $options['directions_options'] ) ? $options['directions_options'] : 'false';?>;
-				var directionsOptions = "";
-				if (!directionsStringFromOptions) {
-					directionsOptions = {
-						startPointID : "location_search_address_field",
-						reGetDirectionsFlag : true,
-						clearDirectionsFlag : true
-					};
-				} 
-				else {
-					directionsOptions = jQuery.parseJSON(directionsStringFromOptions);
-				}
-				
-				//initialize Directions
-				directions = new GmapDirections('simplemap', directionOptions); //creates new GmapDirections object to allow user to get directions between different markers (a.k.a. stops or waypoints)
+			//create options for the directions object and combine the starting point of the trip with the address field already being used for search and turn on recalculate and clear directions buttons
+			var options = {
+				startPointID : "location_search_address_field",
+				reGetDirectionsFlag : true,
+				clearDirectionsFlag : true
 			}
-
-			console.log("Map is turned " + directionsOn);
-
+			directions = new GmapDirections('simplemap', options); //creates new GmapDirections object to allow user to get directions between different markers (a.k.a. stops or waypoints)
+			
 
 			/* Function: arrangeCategoryColumns 
 						 * Author: willhlaw <will.lawrence [at] gmail>
