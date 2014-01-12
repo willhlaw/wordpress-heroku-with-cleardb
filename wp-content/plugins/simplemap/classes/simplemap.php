@@ -1205,10 +1205,10 @@ if ( !class_exists( 'Simple_Map' ) ) {
 				}
 			} // end of GmapDirections 'class'
 
-			var directionsOn = <?php $isset ( $options['directions_for_maps'] ) ? $options['directions_for_maps'] : 'true';?>;
+			var directionsOn = <?php echo $isset ( $options['directions_for_maps'] ) ? $options['directions_for_maps'] : 'true';?>;
 			if (directionsOn || directionsOn == 'checked') {
 				//create options for the directions object and combine the starting point of the trip with the address field already being used for search and turn on recalculate and clear directions buttons
-				var directionsStringFromOptions = <?php $isset( $options['directions_options'] ) ? $options['directions_options'] : 'false';?>;
+				var directionsStringFromOptions = <?php echo $isset( $options['directions_options'] ) ? $options['directions_options'] : 'false';?>;
 				var directionsOptions = "";
 				if (!directionsStringFromOptions) {
 					directionsOptions = {
@@ -1224,6 +1224,7 @@ if ( !class_exists( 'Simple_Map' ) ) {
 				//initialize Directions
 				directions = new GmapDirections('simplemap', directionOptions); //creates new GmapDirections object to allow user to get directions between different markers (a.k.a. stops or waypoints)
 			}
+
 			console.log("Map is turned " + directionsOn);
 
 
