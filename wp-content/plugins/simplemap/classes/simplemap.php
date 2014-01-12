@@ -993,14 +993,18 @@ if ( !class_exists( 'Simple_Map' ) ) {
 						}
 						if (thisObj.reGetDirectionsFlag) {
 							//setup Recalculate Trip 
-							inserAfter(startPoint, "<td>" + "<input type='button' id='gd-reGetDirections' value='Recalculate Trip' />" + "</td>");
+							var newSpanForButton = document.createElement("span");
+							newSpanForButton.innerHTML = "<input type='button' id='gd-reGetDirections' value='Recalculate Trip' />";
+							insertAfter(document.getElementById( mapContainerId) , newSpanForButton);
 							//add click event to recalculate with new start point with other stops / waypoints the same.
 							jQuery('#gd-reGetDirections').click(function() {
 								thisObj.computeDirections(); //computeDirections handles all the defaults (grabs gd-startPoint from page and uses last waypoint)
 							});
 						}
 						if (thisObj.clearDirectionsFlag) {
-							insertAfter(startPoint, "<td>" + "<input type='button' id='gd-clearDirections' value='Clear Trip' />" + "</td>");
+							var newSpanForButton = document.createElement("span");
+							newSpanForButton.innerHTML = "<input type='button' id='gd-clearDirections' value='Clear Trip' />";
+							insertAfter(document.getElementById( mapContainerId) , newSpanForButton);
 							//add click event to clear trip
 							jQuery('#gd-clearDirections').click(function() {
 								thisObj.clearDirections(); 
