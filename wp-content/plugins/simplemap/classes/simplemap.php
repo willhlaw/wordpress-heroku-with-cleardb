@@ -883,6 +883,8 @@ if ( !class_exists( 'Simple_Map' ) ) {
 						if (thisObj.startMarker !== null) {
 							thisObj.startMarker.setMap(null);
 						}
+						//clear Stops for the directions in memory
+						thisObj.resetStops();
 						
 					};
 				}
@@ -991,7 +993,16 @@ if ( !class_exists( 'Simple_Map' ) ) {
 						} else {
 							startAddress = startPoint.value || startPoint.innerHTML || start; //accounts for when startPoint is an input or a span
 						}
-						if (thisObj.reGetDirectionsFlag) {
+						if (thisObj.clearDirectionsFlag && !document.getElementById('gd-clearDirections')) {
+							var newSpanForButton = document.createElement("span");
+							newSpanForButton.innerHTML = "<input type='button' id='gd-clearDirections' value='Clear Trip' />";
+							insertAfter(document.getElementById( mapContainerId) , newSpanForButton);
+							//add click event to clear trip
+							jQuery('#gd-clearDirections').click(function() {
+								thisObj.clearDirections(); 
+							});
+						}
+						if (thisObj.reGetDirectionsFlag && !document.getElementById('gd-reGetDirectionsFlag')) {
 							//setup Recalculate Trip 
 							var newSpanForButton = document.createElement("span");
 							newSpanForButton.innerHTML = "<input type='button' id='gd-reGetDirections' value='Recalculate Trip' />";
@@ -999,15 +1010,6 @@ if ( !class_exists( 'Simple_Map' ) ) {
 							//add click event to recalculate with new start point with other stops / waypoints the same.
 							jQuery('#gd-reGetDirections').click(function() {
 								thisObj.computeDirections(); //computeDirections handles all the defaults (grabs gd-startPoint from page and uses last waypoint)
-							});
-						}
-						if (thisObj.clearDirectionsFlag) {
-							var newSpanForButton = document.createElement("span");
-							newSpanForButton.innerHTML = "<input type='button' id='gd-clearDirections' value='Clear Trip' />";
-							insertAfter(document.getElementById( mapContainerId) , newSpanForButton);
-							//add click event to clear trip
-							jQuery('#gd-clearDirections').click(function() {
-								thisObj.clearDirections(); 
 							});
 						}
 						startPoint.value = startPoint.HTML = startAddress; //sets it in case it is the first address from infowindow
@@ -1193,6 +1195,16 @@ if ( !class_exists( 'Simple_Map' ) ) {
 							console.log(gHash + " could not be deleted. Call was to .removeStop(" + geoHashorLat + ", " + lng + ") and error is: " + e);
 						}
 						return gHash;
+					};
+				}
+
+				//clearStops clears all of the waypoints and associated tracking variables
+				if(typeof(thisObj.resetStops)==='undefined') { //guarantees one time prototyping 
+					GmapDirections.prototype.resetStops = function(geoHashorLat, lng) {
+						thisObj.waypoints = []; //associative array with geohash as keys and values as waypoints objects for Google's Directions waypoints
+						thisObj.waypointsLength = 0; //keep track of length of associative array
+						thisObj.startWaypoint = "";
+						thisObj.endWaypoint = "";
 					};
 				}
 			} // end of GmapDirections 'class'
