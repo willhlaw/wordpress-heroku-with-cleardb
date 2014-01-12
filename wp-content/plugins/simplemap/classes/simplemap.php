@@ -1205,7 +1205,7 @@ if ( !class_exists( 'Simple_Map' ) ) {
 				}
 			} // end of GmapDirections 'class'
 
-			var directionsOn = <?php echo $isset ( $options['directions_for_maps'] ) ? $options['directions_for_maps'] : 'true';?>;
+			var directionsOn = <?php echo $isset ( $options['directions_for_maps'] ) ? $options['directions_for_maps'] : 'true';?> || true;
 			if (directionsOn || directionsOn == 'checked') {
 				//create options for the directions object and combine the starting point of the trip with the address field already being used for search and turn on recalculate and clear directions buttons
 				var directionsStringFromOptions = <?php echo $isset( $options['directions_options'] ) ? $options['directions_options'] : 'false';?>;
