@@ -837,6 +837,8 @@ if ( !class_exists( 'Simple_Map' ) ) {
 				thisObj.startPointDivID = options.startPointDivID || "gd-start";
 				thisObj.startPointLabel = options.startPointLabel || "Your trip's starting address:";
 				thisObj.startPointID = options.startPointID || "gd-startPoint";
+				thisObj.reGetDirectionsFlag = options.reGetDirectionsFlag || false; //if true, renders Recalculate Trip button below map container
+				thisObj.clearDirectionsFlag = options.clearDirectionsFlag || false; //if true, renders Clear Trip button below map containr
 
 				if(typeof(thisObj.setDisplay)==='undefined') {//guarantees one time prototyping 
 					GmapDirections.prototype.setDisplay = function (map) {
@@ -989,7 +991,21 @@ if ( !class_exists( 'Simple_Map' ) ) {
 						} else {
 							startAddress = startPoint.value || startPoint.innerHTML || start; //accounts for when startPoint is an input or a span
 						}
-
+						if (thisObj.reGetDirectionsFlag) {
+							//setup Recalculate Trip 
+							inserAfter(startPoint, "<td>" + "<input type='button' id='gd-reGetDirections' value='Recalculate Trip' />" + "</td>");
+							//add click event to recalculate with new start point with other stops / waypoints the same.
+							jQuery('#gd-reGetDirections').click(function() {
+								thisObj.computeDirections(); //computeDirections handles all the defaults (grabs gd-startPoint from page and uses last waypoint)
+							});
+						}
+						if (thisObj.clearDirectionsFlag) {
+							insertAfter(startPoint, "<td>" + "<input type='button' id='gd-clearDirections' value='Clear Trip' />" + "</td>");
+							//add click event to clear trip
+							jQuery('#gd-clearDirections').click(function() {
+								thisObj.clearDirections(); 
+							});
+						}
 						startPoint.value = startPoint.HTML = startAddress; //sets it in case it is the first address from infowindow
 						//need to remove the last waypoint object because it is the same as our destination, and destination is required to be passed in
 						if (thisObj.endWaypoint === "") {
@@ -1177,9 +1193,11 @@ if ( !class_exists( 'Simple_Map' ) ) {
 				}
 			} // end of GmapDirections 'class'
 
-			//create options for the directions object and combine the starting point of the trip with the address field already being used for search
+			//create options for the directions object and combine the starting point of the trip with the address field already being used for search and turn on recalculate and clear directions buttons
 			var options = {
-				startPointID : "location_search_address_field"
+				startPointID : "location_search_address_field",
+				reGetDirectionsFlag : true,
+				clearDirectionsFlag : true
 			}
 			directions = new GmapDirections('simplemap', options); //creates new GmapDirections object to allow user to get directions between different markers (a.k.a. stops or waypoints)
 
