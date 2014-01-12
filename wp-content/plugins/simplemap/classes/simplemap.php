@@ -817,8 +817,6 @@ if ( !class_exists( 'Simple_Map' ) ) {
 				var options = opts || {}; //prevents undefined errors if no options parameter is passed in. (e.g. options.option1 will no longer complain about opdtions object being undefined)
 				thisObj.display = null; //Google DirectionsRenderer object
 				thisObj.service = null; //Google DirectionsServive object
-				thisObj.resultsDiv = null; //where results from Google Directions API html will be put
-				thisObj.resultsDivId = null; 
 				thisObj.markerWaypoints = []; //marker array for direction results
 				thisObj.startMarker = null; //placemark for start address of a trip
 				thisObj.geoHashBitLen = options.geoHashBitLen || 24; //used for Fgh encode function where bitlen purpose is to geohash to close-by markers to a one or two character difference for unique comparison and find matches between marker directions and waypoints.
@@ -832,7 +830,7 @@ if ( !class_exists( 'Simple_Map' ) ) {
 				});
 				thisObj.travelMode = options.travelMode; // use default option later in call, because google object may not be defined yet. google.maps.DirectionsTravelMode.DRIVING; //cannot be Transit because multiple waypoints does not work for transit
 				thisObj.optimizeWaypoints = options.optimizeWaypoints; // use default option later because google may not be defined.
-				thisObj.resultsDivId = options.resultsDivId || thisObj.mapContainerId + "-results";
+				thisObj.resultsDivId = options.resultsDivId || thisObj.mapContainerId + "-results"; //id of a new div where results from Google Directions API html will be put
 
 				thisObj.startPointDivID = options.startPointDivID || "gd-start";
 				thisObj.startPointLabel = options.startPointLabel || "Your trip's starting address:";
@@ -1207,13 +1205,27 @@ if ( !class_exists( 'Simple_Map' ) ) {
 				}
 			} // end of GmapDirections 'class'
 
-			//create options for the directions object and combine the starting point of the trip with the address field already being used for search and turn on recalculate and clear directions buttons
-			var options = {
-				startPointID : "location_search_address_field",
-				reGetDirectionsFlag : true,
-				clearDirectionsFlag : true
+			var directionsOn = <?php $isset ( $options['directions_for_maps'] ) ? $options['directions_for_maps'] : 'true';?>;
+			if (directionsOn || directionsOn == 'checked') {
+				//create options for the directions object and combine the starting point of the trip with the address field already being used for search and turn on recalculate and clear directions buttons
+				var directionsStringFromOptions = <?php $isset( $options['directions_options'] ) ? $options['directions_options'] : 'false';?>;
+				var directionsOptions = "";
+				if (!directionsStringFromOptions) {
+					directionsOptions = {
+						startPointID : "location_search_address_field",
+						reGetDirectionsFlag : true,
+						clearDirectionsFlag : true
+					};
+				} 
+				else {
+					directionsOptions = jQuery.parseJSON(directionsStringFromOptions);
+				}
+				
+				//initialize Directions
+				directions = new GmapDirections('simplemap', directionOptions); //creates new GmapDirections object to allow user to get directions between different markers (a.k.a. stops or waypoints)
 			}
-			directions = new GmapDirections('simplemap', options); //creates new GmapDirections object to allow user to get directions between different markers (a.k.a. stops or waypoints)
+			console.log("Map is turned " + directionsOn);
+
 
 			/* Function: arrangeCategoryColumns 
 						 * Author: willhlaw <will.lawrence [at] gmail>
