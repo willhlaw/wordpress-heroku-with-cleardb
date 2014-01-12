@@ -883,9 +883,6 @@ if ( !class_exists( 'Simple_Map' ) ) {
 						if (thisObj.startMarker !== null) {
 							thisObj.startMarker.setMap(null);
 						}
-						//clear Stops for the directions in memory
-						thisObj.resetStops();
-						
 					};
 				}
 
@@ -898,7 +895,7 @@ if ( !class_exists( 'Simple_Map' ) ) {
 						var theRoute = directionResult.routes[0].legs;
 						var stepDisplay = new google.maps.InfoWindow();
 
-						//TODO, programmatically determine these images after directions results get seet
+						//TODO, programmatically determine these images after directions results get set
 						var directionsImage = [];
 						directionsImage[0] = "http://maps.gstatic.com/mapfiles/markers2/icon_greenA.png";
 						directionsImage[1] = "http://maps.gstatic.com/mapfiles/markers2/icon_greenB.png";
@@ -999,10 +996,11 @@ if ( !class_exists( 'Simple_Map' ) ) {
 							insertAfter(document.getElementById( mapContainerId) , newSpanForButton);
 							//add click event to clear trip
 							jQuery('#gd-clearDirections').click(function() {
-								thisObj.clearDirections(); 
+								thisObj.clearDirections(); //clears stuff maps
+								thisObj.resetStops();	   //clear stops for the directions in memory
 							});
 						}
-						if (thisObj.reGetDirectionsFlag && !document.getElementById('gd-reGetDirectionsFlag')) {
+						if (thisObj.reGetDirectionsFlag && !document.getElementById('gd-reGetDirections')) {
 							//setup Recalculate Trip 
 							var newSpanForButton = document.createElement("span");
 							newSpanForButton.innerHTML = "<input type='button' id='gd-reGetDirections' value='Recalculate Trip' />";
