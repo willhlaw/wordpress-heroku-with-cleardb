@@ -1212,7 +1212,6 @@ if ( !class_exists( 'Simple_Map' ) ) {
 				clearDirectionsFlag : true
 			}
 			directions = new GmapDirections('simplemap', options); //creates new GmapDirections object to allow user to get directions between different markers (a.k.a. stops or waypoints)
-			jQuery("#results").hide(); //hides search results on load
 
 			/* Function: arrangeCategoryColumns 
 						 * Author: willhlaw <will.lawrence [at] gmail>
@@ -1265,9 +1264,9 @@ if ( !class_exists( 'Simple_Map' ) ) {
 			};
 
 			//wait until page loads and DOM is ready before
-			//calling function to arrange category labels into a table with columns
 			jQuery(document).ready( function () {
-				arrangeCategoryColumns("#location_search_sm-category_fields", ')'); 
+				arrangeCategoryColumns("#location_search_sm-category_fields", ')'); //calling function to arrange category labels into a table with columns
+				jQuery("#results").hide(); //hides search results on load
 			});
 
 
