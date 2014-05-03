@@ -939,16 +939,6 @@ if ( !class_exists( 'Simple_Map' ) ) {
 			   if (typeof to[prop] == "undefined") to[prop] = from[prop];
 			  }
 			}
-		
-			//initialize the custom tooltip class to be used to ensure google.maps is loaded
-			if (typeof google !== "undefined" && typeof google.maps != "undefined" && typeof google.maps.OverlayView != "undefined") {
-		      inherit(Tooltip, google.maps.OverlayView); // Inherits from OverlayView from the Google Maps API
-		      console.log("Tooltip for markers are turned on.");
-		  	 } 
-		  	 else {
-		  	  //tooltop didn't load properly. Perhaps google.maps api did not load
-		  	  console.log("Tooltip for markers are not turned on.");
-		  	 }
 
 			
 			/* Function: GmapDirections class
@@ -1913,8 +1903,18 @@ if ( !class_exists( 'Simple_Map' ) ) {
 				var marker = new google.maps.Marker( markerOptions );
 				marker.title = locationData.name;
 				markersArray.push(marker); //add geoHash for gMapDirections
-				
-				if (typeof Tooltip !== "undefined") {
+
+				//initialize the custom tooltip class to be used to ensure google.maps is loaded
+				if (typeof google !== "undefined" && typeof google.maps != "undefined" && typeof google.maps.OverlayView != "undefined") {
+			      inherit(Tooltip, google.maps.OverlayView); // Inherits from OverlayView from the Google Maps API
+			      console.log("Tooltip for markers are turned on.");
+			  	 } 
+			  	 else {
+			  	  //tooltop didn't load properly. Perhaps google.maps api did not load
+			  	  console.log("Tooltip for markers are not turned on.");
+			  	}
+		
+				if (typeof Tooltip !== "undefined" && typeof Tooltip.setValues !== "undefined") {
 					marker.tooltip = locationData.name; //uses custom Tooltip, included above inline and from http://googlemapapitutorial.com/customizedtooltip.jsp
 					var tooltip = new Tooltip({map: map}, marker);
 			        tooltip.bindTo("text", marker, "tooltip");
