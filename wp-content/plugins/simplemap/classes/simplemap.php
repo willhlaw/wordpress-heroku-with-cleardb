@@ -912,6 +912,8 @@ if ( !class_exists( 'Simple_Map' ) ) {
 				        this.div_.style.visibility = "visible";
 				    }
 				}
+
+				return Tooltip;
 			};
 
 			
@@ -1885,7 +1887,7 @@ if ( !class_exists( 'Simple_Map' ) ) {
 				  cssClass: 'tooltip' // name of a css class to apply to tooltip
 				};
 				if (typeof Tooltip === "undefined") {
-					TooltipWrapper();
+					Tooltip = TooltipWrapper();
 				}
 				var tooltip = new Tooltip(tooltipOptions);
 
