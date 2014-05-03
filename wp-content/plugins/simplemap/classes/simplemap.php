@@ -817,7 +817,7 @@ if ( !class_exists( 'Simple_Map' ) ) {
 			function Tooltip(opts, marker) {
 
 			  // Initialization
-			  this.setValues(opts);
+			  this.prototype.setValues(opts); //setValues has been moved to google.maps.OverlayView.prototype
 			  this.map_ = opts.map;
 			  this.marker_ = marker;
 			  var div = this.div_ = document.createElement("div");
@@ -1904,13 +1904,14 @@ if ( !class_exists( 'Simple_Map' ) ) {
 				marker.title = locationData.name;
 				markersArray.push(marker); //add geoHash for gMapDirections
 
-				var isTooltipInitialized = (typeof Tooltip !== "undefined" && typeof Tooltip.setValues !== "undefined");
+				var isTooltipInitialized = (typeof Tooltip !== "undefined" && typeof Tooltip.prototype.setValues !== "undefined");
 				//initialize the custom tooltip class to be used to ensure google.maps is loaded
 				if (!isTooltipInitialized && typeof google !== "undefined" && typeof google.maps != "undefined" && typeof google.maps.OverlayView != "undefined") {
 			      inherit(Tooltip, google.maps.OverlayView); // Inherits from OverlayView from the Google Maps API
 			      console.log("Tooltip for markers are turned on.");
 			  	 }
 		
+				isTooltipInitialized = (typeof Tooltip !== "undefined" && typeof Tooltip.prototype.setValues !== "undefined");
 				if (isTooltipInitialized) {
 
 					console.log("Tooltip is initialized and setting tooltip for marker " + marker.title);
