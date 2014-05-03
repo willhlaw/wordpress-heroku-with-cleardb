@@ -807,138 +807,112 @@ if ( !class_exists( 'Simple_Map' ) ) {
 			//var directionsService;
 			//var directionsResults;
 
-			/* Function: Tooltip class
-			 * Source: http://googlemapapitutorial.com/customizedtooltip.jsp
-			 * Dependencies: Google.maps js needs to be loaded
-			 */
-			// The custom tooltip class
 
-			// Constructor function
-			function Tooltip(opts, marker) {
+			//wrapper for Tooltip class to ensure it only is called when Google.maps object has been instantiated.
+			function TooltipWrapper() {
 
-			  // Initialization
-			  this.prototype.setValues(opts); //setValues has been moved to google.maps.OverlayView.prototype
-			  this.map_ = opts.map;
-			  this.marker_ = marker;
-			  var div = this.div_ = document.createElement("div");
-			  // Class name of div element to style it via CSS
-			  div.className = "tooltip";
-			  this.markerDragging = false;
-			}
+				/* Function: Tooltip class 
+				 * Author: medelbou <me[at]medelbou[dot]com>
+				 * Dependencies: Google.maps object needs to be instantiated.
+				 * Source: https://github.com/medelbou/Tooltip-for-Google-Maps and http://medelbou.wordpress.com/2012/02/03/creating-a-tooltip-for-google-maps-javascript-api-v3/              
+				 */
 
-			 Tooltip.prototype = {
+				/*
+				 Constructor for the tooltip
+				 @ param options an object containing: marker(required), content(required) and cssClass(a css class, optional)
+				 @ see google.maps.OverlayView()
+				 */
 
-			  // Define draw method to keep OverlayView happy
-			  draw: function() {},
+				function Tooltip(options) {
 
-			  visible_changed: function() {
-			  var vis = this.get("visible");
-			  this.div_.style.visibility  = vis ? "visible" : "hidden";
-			 },
+				    // Now initialize all properties.
+				    this.marker_ = options.marker;
+				    this.content_ = options.content;
+				    this.map_ = options.marker.get('map');
+				    this.cssClass_ = options.cssClass || null;
 
-			 getPos: function(e) {	
-			  var projection = this.getProjection();
-			  // Position of mouse cursor
-			  var pixel = projection.fromLatLngToDivPixel(e.latLng);
-			  var div = this.div_;
+				    // We define a property to hold the content's
+				    // div. We'll actually create this div
+				    // upon receipt of the add() method so we'll
+				    // leave it null for now.
+				    this.div_ = null;
 
-			  // Adjust the tooltip's position
-			  var gap = 15;
-			  var posX = pixel.x + gap;
-			  var posY = pixel.y + gap;
+				    //Explicitly call setMap on this overlay
+				    this.setMap(this.map_);
+				    var me = this;
+				    // Show tooltip on mouseover event.
+				    google.maps.event.addListener(me.marker_, 'mouseover', function () {
+				        me.show();
+				    });
+				    // Hide tooltip on mouseout event.
+				    google.maps.event.addListener(me.marker_, 'mouseout', function () {
+				        me.hide();
+				    });
+				}
+				// Now we extend google.maps.OverlayView()
+				Tooltip.prototype = new google.maps.OverlayView();
 
-			  var menuwidth = div.offsetWidth;
-			  // Right boundary of the map
-			  var boundsNE = this.map_.getBounds().getNorthEast();
-			  boundsNE.pixel = projection.fromLatLngToDivPixel(boundsNE);
+				// onAdd is one of the functions that we must implement, 
+				// it will be called when the map is ready for the overlay to be attached.
+				Tooltip.prototype.onAdd = function () {
 
-			  if (menuwidth + posX > boundsNE.pixel.x) {
-			    posX -= menuwidth + gap;
-			  }
-			  div.style.left = posX + "px";
-			  div.style.top = posY + "px";
+				    // Create the DIV and set some basic attributes.
+				    var div = document.createElement('DIV');
+				    div.style.position = "absolute";
+				    // Hide tooltip
+				    div.style.visibility = "hidden";
+				    if (this.cssClass_)
+				        div.className += " " + this.cssClass_;
 
-			  if (!this.markerDragging) {
-			   this.set("visible", true);
-			  }
-			 },
-			 
-			 getPos2: function(latLng) {	// This is added to avoid using listener (Listener is not working when Map is quickly loaded with icons)
-			  var projection = this.getProjection();
-			  // Position of mouse cursor
-			  var pixel = projection.fromLatLngToDivPixel(latLng);
-			  var div = this.div_;
+				    //Attach content to the DIV.
+				    div.innerHTML = this.content_;
 
-			  // Adjust the tooltip's position
-			  var gap = 5;
-			  var posX = pixel.x + gap;
-			  var posY = pixel.y + gap;
+				    // Set the overlay's div_ property to this DIV
+				    this.div_ = div;
 
-			  var menuwidth = div.offsetWidth;
-			  // Right boundary of the map
-			  var boundsNE = this.map_.getBounds().getNorthEast();
-			  boundsNE.pixel = projection.fromLatLngToDivPixel(boundsNE);
+				    // We add an overlay to a map via one of the map's panes.
+				    // We'll add this overlay to the floatPane pane.
+				    var panes = this.getPanes();
+				    panes.floatPane.appendChild(this.div_);
 
-			  if (menuwidth + posX > boundsNE.pixel.x) {
-			    posX -= menuwidth + gap;
-			  }
-			  div.style.left = posX + "px";
-			  div.style.top = posY + "px";
+				}
+				// We here implement draw
+				Tooltip.prototype.draw = function () {
 
-			  if (!this.markerDragging) {
-			   this.set("visible", true);
-			  }
-			 }, 
+				    // Position the overlay. We use the position of the marker
+				    // to peg it to the correct position, just northeast of the marker.
+				    // We need to retrieve the projection from this overlay to do this.
+				    var overlayProjection = this.getProjection();
 
-			 addTip: function() {
-			  var me = this;
-			  var g = google.maps.event;
-			  var div = me.div_;
-			  div.innerHTML = me.get("text").toString();
-			  // Tooltip is initially hidden
-			  me.set("visible", false);
-			  // Append the tooltip's div to the floatPane
-			  me.getPanes().floatPane.appendChild(this.div_);
+				    // Retrieve the coordinates of the marker
+				    // in latlngs and convert them to pixels coordinates.
+				    // We'll use these coordinates to place the DIV.
+				    var ne = overlayProjection.fromLatLngToDivPixel(this.marker_.getPosition());
 
-			  // In IE this listener gets randomly lost after it's been cleared once.
-			  // So keep it out of the listeners array.
-			   g.addListener(me.marker_, "dragend", function() {
-			     me.markerDragging = false; });
-			     
-			  // Register listeners
-			  me.listeners = [
-			//   g.addListener(me.marker_, "dragend", function() {
-			//    me.markerDragging = false; }),	
-			   g.addListener(me.marker_, "position_changed", function() {
-			    me.markerDragging = true;
-			    me.set("visible", false); }),
-			   g.addListener(me.map_, "mousemove", function(e) {
-			     me.getPos(e); })
-			  ];
-			 },
+				    // Position the DIV.
+				    var div = this.div_;
+				    div.style.left = ne.x + 'px';
+				    div.style.top = ne.y + 'px';
 
-			 removeTip: function() {
-			  // Clear the listeners to stop events when not needed.
-			  if (this.listeners) {
-			   for (var i = 0, listener; listener = this.listeners[i]; i++) {
-			     google.maps.event.removeListener(listener);
-			   }
-			   delete this.listeners;
-			  }
-			  // Remove the tooltip from the map pane.
-			  var parent = this.div_.parentNode;
-			  if (parent) parent.removeChild(this.div_);
-			 }
+				}
+				// We here implement onRemove
+				Tooltip.prototype.onRemove = function () {
+				    this.div_.parentNode.removeChild(this.div_);
+				}
+
+				// Note that the visibility property must be a string enclosed in quotes
+				Tooltip.prototype.hide = function () {
+				    if (this.div_) {
+				        this.div_.style.visibility = "hidden";
+				    }
+				}
+
+				Tooltip.prototype.show = function () {
+				    if (this.div_) {
+				        this.div_.style.visibility = "visible";
+				    }
+				}
 			};
-
-			 function inherit(addTo, getFrom) {
-
-			  var from = getFrom.prototype;  // prototype object to get methods from
-			  var to = addTo.prototype;      // prototype object to add methods to
-			  for (var prop in from) {
-			   if (typeof to[prop] == "undefined") to[prop] = from[prop];
-			  }
-			}
 
 			
 			/* Function: GmapDirections class
@@ -1904,33 +1878,16 @@ if ( !class_exists( 'Simple_Map' ) ) {
 				marker.title = locationData.name;
 				markersArray.push(marker); //add geoHash for gMapDirections
 
-				var isTooltipInitialized = (typeof Tooltip !== "undefined" && typeof Tooltip.prototype.setValues !== "undefined");
-				//initialize the custom tooltip class to be used to ensure google.maps is loaded
-				if (!isTooltipInitialized && typeof google !== "undefined" && typeof google.maps != "undefined" && typeof google.maps.OverlayView != "undefined") {
-			      inherit(Tooltip, google.maps.OverlayView); // Inherits from OverlayView from the Google Maps API
-			      console.log("Tooltip for markers are turned on.");
-			  	 }
-		
-				isTooltipInitialized = (typeof Tooltip !== "undefined" && typeof Tooltip.prototype.setValues !== "undefined");
-				if (isTooltipInitialized) {
-
-					console.log("Tooltip is initialized and setting tooltip for marker " + marker.title);
-					marker.tooltip = locationData.name; //uses custom Tooltip, included above inline and from http://googlemapapitutorial.com/customizedtooltip.jsp
-					var tooltip = new Tooltip({map: map}, marker);
-			        tooltip.bindTo("text", marker, "tooltip");
-			        google.maps.event.addListener(marker, 'mouseover', function() {
-			            tooltip.addTip();
-			            tooltip.getPos2(marker.getPosition());
-			            console.log(marker.title);
-			        });
-			  	
-			        google.maps.event.addListener(marker, 'mouseout', function() {
-			            tooltip.removeTip();
-			            console.log("exiting");
-			        });
-			    } else {
-					console.log("Tooltip is not initialized");
+				//added for custom Tooltip
+				var tooltipOptions={
+				  marker: marker,// required
+				  content: locationData.name,// required
+				  cssClass: 'tooltip' // name of a css class to apply to tooltip
+				};
+				if (typeof Tooltip === "undefined") {
+					TooltipWrapper();
 				}
+				var tooltip = new Tooltip(tooltipOptions);
 
 				var mapwidth = Number(stringFilter(map_width));
 				if (map_width.indexOf("%") >= 0) {
