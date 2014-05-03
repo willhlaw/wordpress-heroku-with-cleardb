@@ -1943,6 +1943,12 @@ if ( !class_exists( 'Simple_Map' ) ) {
 					directions.setDirections(this, infowindow); //'this' refers to marker which has position information and this call sets event listener in GmapDirections object so user can interact with direction buttons inside infowindow
 				});
 
+				google.maps.event.addListener(marker, 'mouseover', function() { 
+					alert(0);
+					console.log(marker.title);
+					console.dir(marker);
+				});
+
 				return marker;
 			}
 
