@@ -1904,29 +1904,32 @@ if ( !class_exists( 'Simple_Map' ) ) {
 				marker.title = locationData.name;
 				markersArray.push(marker); //add geoHash for gMapDirections
 
+				var isTooltipInitialized = (typeof Tooltip !== "undefined" && typeof Tooltip.setValues !== "undefined");
 				//initialize the custom tooltip class to be used to ensure google.maps is loaded
-				if (typeof google !== "undefined" && typeof google.maps != "undefined" && typeof google.maps.OverlayView != "undefined") {
+				if (!isTooltipInitialized && typeof google !== "undefined" && typeof google.maps != "undefined" && typeof google.maps.OverlayView != "undefined") {
 			      inherit(Tooltip, google.maps.OverlayView); // Inherits from OverlayView from the Google Maps API
 			      console.log("Tooltip for markers are turned on.");
-			  	 } 
-			  	 else {
-			  	  //tooltop didn't load properly. Perhaps google.maps api did not load
-			  	  console.log("Tooltip for markers are not turned on.");
-			  	}
+			  	 }
 		
-				if (typeof Tooltip !== "undefined" && typeof Tooltip.setValues !== "undefined") {
+				if (isTooltipInitialized) {
+
+					console.log("Tooltip is initialized and setting tooltip for marker " + marker.title);
 					marker.tooltip = locationData.name; //uses custom Tooltip, included above inline and from http://googlemapapitutorial.com/customizedtooltip.jsp
 					var tooltip = new Tooltip({map: map}, marker);
 			        tooltip.bindTo("text", marker, "tooltip");
 			        google.maps.event.addListener(marker, 'mouseover', function() {
 			            tooltip.addTip();
 			            tooltip.getPos2(marker.getPosition());
+			            console.log(marker.title);
 			        });
 			  	
 			        google.maps.event.addListener(marker, 'mouseout', function() {
 			            tooltip.removeTip();
+			            console.log("exiting");
 			        });
-			    } 
+			    } else {
+					console.log("Tooltip is not initialized");
+				}
 
 				var mapwidth = Number(stringFilter(map_width));
 				if (map_width.indexOf("%") >= 0) {
