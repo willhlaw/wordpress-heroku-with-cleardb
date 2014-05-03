@@ -938,12 +938,19 @@ if ( !class_exists( 'Simple_Map' ) ) {
 			  for (var prop in from) {
 			   if (typeof to[prop] == "undefined") to[prop] = from[prop];
 			  }
-			 }
+			}
+		
+			//initialize the custom tooltip class to be used to ensure google.maps is loaded
+			if (typeof google !== "undefined" && typeof google.maps != "undefined" && typeof google.maps.OverlayView != "undefined") {
+		      inherit(Tooltip, google.maps.OverlayView); // Inherits from OverlayView from the Google Maps API
+		      console.log("Tooltip for markers are turned on.");
+		  	 } 
+		  	 else {
+		  	  //tooltop didn't load properly. Perhaps google.maps api did not load
+		  	  console.log("Tooltip for markers are not turned on.");
+		  	 }
 
-			 // Inherits from OverlayView from the Google Maps API
-			 inherit(Tooltip, google.maps.OverlayView);			
-
-
+			
 			/* Function: GmapDirections class
 			 * Author: willhlaw <will.lawrence [at] gmail>
 			 * Dependencies: jQuery and Google.maps object needs to be instantiated.
@@ -1906,18 +1913,20 @@ if ( !class_exists( 'Simple_Map' ) ) {
 				var marker = new google.maps.Marker( markerOptions );
 				marker.title = locationData.name;
 				markersArray.push(marker); //add geoHash for gMapDirections
-				marker.tooltip = locationData.name; //uses custom Tooltip, included above inline and from http://googlemapapitutorial.com/customizedtooltip.jsp
 				
-				var tooltip = new Tooltip({map: map}, marker);
-		        tooltip.bindTo("text", marker, "tooltip");
-		        google.maps.event.addListener(marker, 'mouseover', function() {
-		            tooltip.addTip();
-		            tooltip.getPos2(marker.getPosition());
-		        });
-		  	
-		        google.maps.event.addListener(marker, 'mouseout', function() {
-		            tooltip.removeTip();
-		        });
+				if (typeof Tooltip !== "undefined") {
+					marker.tooltip = locationData.name; //uses custom Tooltip, included above inline and from http://googlemapapitutorial.com/customizedtooltip.jsp
+					var tooltip = new Tooltip({map: map}, marker);
+			        tooltip.bindTo("text", marker, "tooltip");
+			        google.maps.event.addListener(marker, 'mouseover', function() {
+			            tooltip.addTip();
+			            tooltip.getPos2(marker.getPosition());
+			        });
+			  	
+			        google.maps.event.addListener(marker, 'mouseout', function() {
+			            tooltip.removeTip();
+			        });
+			    } 
 
 				var mapwidth = Number(stringFilter(map_width));
 				if (map_width.indexOf("%") >= 0) {
