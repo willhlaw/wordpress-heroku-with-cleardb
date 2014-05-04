@@ -992,6 +992,7 @@ if ( !class_exists( 'Simple_Map' ) ) {
 				thisObj.startPointDivID = options.startPointDivID || "gd-start";
 				thisObj.startPointLabel = options.startPointLabel || "Your trip's starting address:";
 				thisObj.startPointID = options.startPointID || "gd-startPoint";
+				thisObj.startAddress = ""; //stores value when user enters an address for the start of their directions
 				thisObj.reGetDirectionsFlag = options.reGetDirectionsFlag || false; //if true, renders Recalculate Trip button below map container
 				thisObj.clearDirectionsFlag = options.clearDirectionsFlag || false; //if true, renders Clear Trip button below map containr
 
@@ -1078,7 +1079,7 @@ if ( !class_exists( 'Simple_Map' ) ) {
 						//add a custom Tooltip to display the start location
 						var tooltipOptions={
 						  marker: thisObj.startMarker,// required
-						  content: theRoute[0].start_location,// required
+						  content: thisObj.startAddress || theRoute[0].start_address,// required. Shows either what user typed or the actual address Google translated it to.
 						  cssClass: 'tooltip' // name of a css class to apply to tooltip
 						};
 						if (typeof Tooltip === "undefined") {
@@ -1158,6 +1159,8 @@ if ( !class_exists( 'Simple_Map' ) ) {
 						} else {
 							startAddress = startPoint.value || startPoint.innerHTML || start; //accounts for when startPoint is an input or a span
 						}
+						//store the startAddress; 	
+						thisObj.startAddress = startAddress;
 						if (thisObj.clearDirectionsFlag && !document.getElementById('gd-clearDirections')) {
 							var newSpanForButton = document.createElement("span");
 							newSpanForButton.innerHTML = "<input type='button' id='gd-clearDirections' value='Clear Trip' />";
@@ -2122,9 +2125,6 @@ if ( !class_exists( 'Simple_Map' ) ) {
 					window.location = '#map_top';	//Need this when results div below map are clicked so user can focus on window that just opened. But, GmapDirections author is considering removing because behavior is not likely to be wanted by end user				
 
 					directions.setDirections(this, infowindow); //'this' refers to marker which has position information and this call sets event listener in GmapDirections object so user can interact with direction buttons inside infowindow
-				});
-
-				google.maps.event.addListener(marker, 'mouseover', function() { 
 				});
 
 				return marker;
