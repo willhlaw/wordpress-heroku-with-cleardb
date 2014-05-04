@@ -807,15 +807,44 @@ if ( !class_exists( 'Simple_Map' ) ) {
 			//var directionsService;
 			//var directionsResults;
 
+			/* Function: verifyStyle function
+			 * Used to detect if a css class exists
+			 * Source: http://web.archive.org/web/20071210160927/http://www.experts-exchange.com/Programming/Languages/Scripting/JavaScript/Q_21685655.html
+			 */
+			function verifyStyle(selector) {
+			    var rules;
+			    var haveRule = false;
+
+			    if (typeof document.styleSheets != "undefined") {   //is this supported
+			        var cssSheets = document.styleSheets;
+
+			        outerloop:
+			        for (var i = 0; i < cssSheets.length; i++) {
+
+			             //using IE or FireFox/Standards Compliant
+			            rules =  (typeof cssSheets[i].cssRules != "undefined") ? cssSheets[i].cssRules : cssSheets[i].rules;
+
+			             for (var j = 0; j < rules.length; j++) {
+			                 if (rules[j].selectorText == selector) {
+			                         haveRule = true;
+			                        break outerloop;
+			                 }
+			            }//innerloop
+
+			        }//outer loop
+			    }//endif
+
+			    return haveRule;
+			}
+			
+			/* Function: Tooltip class and TooltipWrapper class 
+			 * Author: medelbou <me[at]medelbou[dot]com> modified by <will.lawrence [at] gmail>
+			 * Dependencies: Google.maps object needs to be instantiated. A 'tooltip' css class should be created.
+			 * Source: https://github.com/medelbou/Tooltip-for-Google-Maps and http://medelbou.wordpress.com/2012/02/03/creating-a-tooltip-for-google-maps-javascript-api-v3/              
+			 */
 
 			//wrapper for Tooltip class to ensure it only is called when Google.maps object has been instantiated.
 			function TooltipWrapper() {
-
-				/* Function: Tooltip class 
-				 * Author: medelbou <me[at]medelbou[dot]com>
-				 * Dependencies: Google.maps object needs to be instantiated.
-				 * Source: https://github.com/medelbou/Tooltip-for-Google-Maps and http://medelbou.wordpress.com/2012/02/03/creating-a-tooltip-for-google-maps-javascript-api-v3/              
-				 */
 
 				/*
 				 Constructor for the tooltip
@@ -830,6 +859,13 @@ if ( !class_exists( 'Simple_Map' ) ) {
 				    this.content_ = options.content;
 				    this.map_ = options.marker.get('map');
 				    this.cssClass_ = options.cssClass || null;
+
+					if (this.cssClass_ !== null && typeof verifyStyle === "function") {
+						this.cssClassExists_ = verifyStyle(this.cssClass);
+					}
+					if (this.cssClass_ === null) {
+						this.cssClassExists_ = false;
+					}
 
 				    // We define a property to hold the content's
 				    // div. We'll actually create this div
@@ -863,6 +899,13 @@ if ( !class_exists( 'Simple_Map' ) ) {
 				    div.style.visibility = "hidden";
 				    if (this.cssClass_)
 				        div.className += " " + this.cssClass_;
+
+					//add default styles if cssClass does not exist
+				    if (!this.cssClassExists_) {
+						div.style.border = "thin 1px #eee";
+						div.style.background-color = "background-color";
+						div.style.padding = "5px";
+					}
 
 				    //Attach content to the DIV.
 				    div.innerHTML = this.content_;
