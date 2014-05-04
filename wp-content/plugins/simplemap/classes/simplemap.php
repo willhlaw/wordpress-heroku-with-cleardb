@@ -808,7 +808,8 @@ if ( !class_exists( 'Simple_Map' ) ) {
 			//var directionsResults;
 
 			/* Function: verifyStyle function
-			 * Used to detect if a css class exists
+			 * Used to detect if a css selector exists. To verify a class, pass in ".className".
+			 * Author: ljo8877 at http://lawrence.ecorp.net modified by <will.lawrence [at] gmail>
 			 * Source: http://web.archive.org/web/20071210160927/http://www.experts-exchange.com/Programming/Languages/Scripting/JavaScript/Q_21685655.html
 			 */
 			function verifyStyle(selector) {
@@ -824,12 +825,15 @@ if ( !class_exists( 'Simple_Map' ) ) {
 			             //using IE or FireFox/Standards Compliant
 			            rules =  (typeof cssSheets[i].cssRules != "undefined") ? cssSheets[i].cssRules : cssSheets[i].rules;
 
-			             for (var j = 0; j < rules.length; j++) {
-			                 if (rules[j].selectorText == selector) {
-			                         haveRule = true;
-			                        break outerloop;
-			                 }
-			            }//innerloop
+						//skip check if rules does not exist or is malformed
+						if (typeof rules !== "undefined" && rules !== null && typeof rules.length === "number") {
+				            for (var j = 0; j < rules.length; j++) {
+				                 if (rules[j].selectorText == selector) {
+				                         haveRule = true;
+				                        break outerloop;
+				                 }
+				            }//innerloop
+				        }
 
 			        }//outer loop
 			    }//endif
@@ -860,11 +864,9 @@ if ( !class_exists( 'Simple_Map' ) ) {
 				    this.map_ = options.marker.get('map');
 				    this.cssClass_ = options.cssClass || null;
 
+					this.cssClassExists_ = false; //used to detect if developer using this plugin has defined a 'tooltip' css class
 					if (this.cssClass_ !== null && typeof verifyStyle === "function") {
-						this.cssClassExists_ = verifyStyle(this.cssClass);
-					}
-					if (this.cssClass_ === null) {
-						this.cssClassExists_ = false;
+						this.cssClassExists_ = verifyStyle("." + this.cssClass_);
 					}
 
 				    // We define a property to hold the content's
@@ -897,13 +899,14 @@ if ( !class_exists( 'Simple_Map' ) ) {
 				    div.style.position = "absolute";
 				    // Hide tooltip
 				    div.style.visibility = "hidden";
-				    if (this.cssClass_)
+				    if (this.cssClass_) {
 				        div.className += " " + this.cssClass_;
+				    }
 
 					//add default styles if cssClass does not exist
 				    if (!this.cssClassExists_) {
-						div.style.border = "thin 1px #eee";
-						div.style.background-color = "background-color";
+						div.style.border = "1px thin #eee";
+						div.style.backgroundColor = "#FFFBF0";
 						div.style.padding = "5px";
 					}
 
