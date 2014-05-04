@@ -906,7 +906,8 @@ if ( !class_exists( 'Simple_Map' ) ) {
 					//add default styles if cssClass does not exist
 				    if (!this.cssClassExists_) {
 						div.style.border = "1px thin #eee";
-						div.style.backgroundColor = "#FFFBF0";
+						div.style.color = "white";
+						div.style.backgroundColor = "#428bca";
 						div.style.padding = "5px";
 					}
 
@@ -1074,6 +1075,17 @@ if ( !class_exists( 'Simple_Map' ) ) {
 							zIndex: google.maps.Marker.MAX_ZINDEX,
 							map: map
 						});	
+						//add a custom Tooltip to display the start location
+						var tooltipOptions={
+						  marker: thisObj.startMarker,// required
+						  content: theRoute[0].start_location,// required
+						  cssClass: 'tooltip' // name of a css class to apply to tooltip
+						};
+						if (typeof Tooltip === "undefined") {
+							Tooltip = TooltipWrapper();
+						}
+						var tooltip = new Tooltip(tooltipOptions);
+
 						google.maps.event.addListener(thisObj.startMarker, 'click', function() {
 							stepDisplay.setContent(theRoute[0].start_address); //Show the starting address
 							stepDisplay.open(map, startMarker);
@@ -1089,6 +1101,8 @@ if ( !class_exists( 'Simple_Map' ) ) {
 								zIndex: google.maps.Marker.MAX_ZINDEX + 1,
 								clickable: false
 							});
+							//no need to add a tooltip because the place marker underneath this directions marker will show the tooltip
+
 							//update the direction results with the title by matching the marker geohash with the corresponding waypoints and using the title
 							geoHash = Fgh.encode(marker.position.lat(), marker.position.lng(), thisObj.geoHashBitLen);
 							title = thisObj.waypoints[geoHash].name;
