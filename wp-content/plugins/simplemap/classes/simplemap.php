@@ -2121,24 +2121,24 @@ if ( !class_exists( 'Simple_Map' ) ) {
 
 				html += '	</div>';
 				
-				var infowindow = new google.maps.InfoWindow({
-					maxWidth: maxbubblewidth,
-					content: directions.wrapInfowindow(html, locationData.name, marker) /*inserts logic from GmapDirections object so user can ask for directions with multiple routes */
-				});
-				
 				google.maps.event.addListener(marker, 'click', function(e) {
+					//remember center of map before opening up marker so map can return there after marker is closed
 					directions.mapCenter = map.getCenter();
-					clearInfoWindows();
-
+					clearInfoWindows();										
+					var infowindow = new google.maps.InfoWindow({
+						maxWidth: maxbubblewidth,
+						content: directions.wrapInfowindow(html, locationData.name, marker) /*inserts logic from GmapDirections object so user can ask for directions with multiple routes */
+					});
 					infowindow.open(map, marker);
 					infowindowsArray.push(infowindow);
 					window.location = '#map_top';	//Need this when results div below map are clicked so user can focus on window that just opened. But, GmapDirections author is considering removing because behavior is not likely to be wanted by end user				
 
 					directions.setDirections(this, infowindow); //'this' refers to marker which has position information and this call sets event listener in GmapDirections object so user can interact with direction buttons inside infowindow
-				});
 
-				google.maps.event.addListener(infowindow, 'closeclick', function(e) {
-					map.setCenter(directions.mapCenter);
+					//return map to previous center before marker was clicked.
+					google.maps.event.addListener(infowindow, 'closeclick', function(e) {
+						map.setCenter(directions.mapCenter);
+					});
 				});
 
 				return marker;
