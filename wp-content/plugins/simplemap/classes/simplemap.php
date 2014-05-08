@@ -822,7 +822,13 @@ if ( !class_exists( 'Simple_Map' ) ) {
 			        outerloop:
 			        for (var i = 0; i < cssSheets.length; i++) {
 
-			             //using IE or FireFox/Standards Compliant
+						//skip external css stylesheets due to some browsers (e.g. Firefox) throwing a Security exception
+						if (typeof cssSheets[i].href === "string" && cssSheets[i].href.indexOf(location.host) < 0) {
+							//this is an external style sheet so skip it
+							continue;
+						}
+
+			            //using IE or FireFox/Standards Compliant
 			            rules =  (typeof cssSheets[i].cssRules != "undefined") ? cssSheets[i].cssRules : cssSheets[i].rules;
 
 						//skip check if rules does not exist or is malformed
